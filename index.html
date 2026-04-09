@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEEPSHIELD — Détecteur de DeepFakes</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --neon: #0ff;
+  --neon2: #f0f;
+  --neon3: #ff0;
+  --red: #ff2244;
+  --green: #39ff14;
+  --bg: #000205;
+  --card: rgba(0,255,255,0.04);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:#e0ffff;
+  font-family:'Share Tech Mono',monospace;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ===== CUSTOM CURSOR ===== */
+#cur{
+  position:fixed;width:12px;height:12px;
+  background:var(--neon);
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 20px var(--neon),0 0 40px var(--neon);
+  transition:transform 0.05s;
+}
+#cur2{
+  position:fixed;width:50px;height:50px;
+  border:1px solid rgba(0,255,255,0.5);
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:all 0.12s ease;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+}
+#cur3{
+  position:fixed;width:80px;height:80px;
+  border:1px solid rgba(0,255,255,0.15);
+  pointer-events:none;z-index:99997;
+  transform:translate(-50%,-50%) rotate(45deg);
+  transition:all 0.22s ease;
+}
+
+/* ===== CANVAS BG ===== */
+#bg-canvas{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;
+}
+
+/* ===== SCANLINES ===== */
+.scanlines{
+  position:fixed;inset:0;z-index:2;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+}
+
+/* ===== VIGNETTE ===== */
+.vignette{
+  position:fixed;inset:0;z-index:3;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.8) 100%);
+}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:20px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(0,255,255,0.1);
+  background:rgba(0,2,5,0.8);
+  backdrop-filter:blur(20px);
+}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:36px;height:36px;
+  border:2px solid var(--neon);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+  box-shadow:0 0 15px var(--neon),inset 0 0 15px rgba(0,255,255,0.1);
+  animation:logoPulse 2s ease-in-out infinite;
+}
+@keyframes logoPulse{
+  0%,100%{box-shadow:0 0 15px var(--neon),inset 0 0 15px rgba(0,255,255,0.1)}
+  50%{box-shadow:0 0 30px var(--neon),0 0 60px rgba(0,255,255,0.3),inset 0 0 30px rgba(0,255,255,0.2)}
+}
+.logo-text{
+  font-family:'Orbitron',monospace;
+  font-weight:900;font-size:1.1rem;
+  letter-spacing:4px;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:none;
+}
+.nav-center{display:flex;gap:8px}
+.nav-pill{
+  font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;
+  padding:6px 16px;border:1px solid rgba(0,255,255,0.2);
+  color:rgba(0,255,255,0.5);
+  transition:all 0.2s;
+  cursor:none;
+}
+.nav-pill:hover{
+  border-color:var(--neon);color:var(--neon);
+  background:rgba(0,255,255,0.05);
+  box-shadow:0 0 15px rgba(0,255,255,0.2);
+}
+.nav-status{
+  display:flex;align-items:center;gap:8px;
+  font-size:0.6rem;letter-spacing:2px;color:var(--green);
+}
+.status-dot{
+  width:8px;height:8px;background:var(--green);border-radius:50%;
+  box-shadow:0 0 10px var(--green);
+  animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ===== HERO ===== */
+.hero{
+  position:relative;z-index:10;
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:120px 48px 60px;
+  overflow:hidden;
+}
+
+/* Glitch text */
+.glitch-wrap{position:relative;display:inline-block;margin-bottom:8px}
+.hero-eyebrow{
+  font-size:0.65rem;letter-spacing:6px;text-transform:uppercase;
+  color:var(--neon2);
+  text-shadow:0 0 10px var(--neon2);
+  animation:fadeSlide 0.8s ease both;
+}
+
+.hero-title{
+  font-family:'Black Ops One',monospace;
+  font-size:clamp(5rem,12vw,10rem);
+  line-height:0.85;
+  margin:16px 0;
+  position:relative;
+}
+.t1{
+  display:block;
+  color:#fff;
+  text-shadow:3px 3px 0 var(--neon),6px 6px 0 rgba(0,255,255,0.2);
+  animation:fadeSlide 0.8s 0.1s ease both;
+}
+.t2{
+  display:block;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px var(--neon));
+  animation:fadeSlide 0.8s 0.2s ease both, hueRot 4s linear infinite;
+  position:relative;
+}
+@keyframes hueRot{
+  0%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(0deg)}
+  100%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(360deg)}
+}
+.t3{
+  display:block;
+  color:var(--red);
+  text-shadow:0 0 30px var(--red),-3px -3px 0 rgba(255,34,68,0.3);
+  animation:fadeSlide 0.8s 0.3s ease both;
+}
+
+/* Glitch effect on hover */
+.hero-title:hover .t1{animation:glitch1 0.3s steps(1) infinite}
+@keyframes glitch1{
+  0%{clip-path:inset(0 0 90% 0);transform:translate(-4px,0)}
+  20%{clip-path:inset(30% 0 50% 0);transform:translate(4px,0)}
+  40%{clip-path:inset(60% 0 20% 0);transform:translate(-2px,0)}
+  60%{clip-path:inset(10% 0 70% 0);transform:translate(2px,0)}
+  80%{clip-path:inset(80% 0 5% 0);transform:translate(-4px,0)}
+  100%{clip-path:inset(0);transform:none}
+}
+
+.hero-sub{
+  font-size:0.85rem;line-height:1.9;
+  color:rgba(224,255,255,0.6);
+  max-width:500px;
+  margin:24px 0 40px;
+  animation:fadeSlide 0.8s 0.4s ease both;
+  border-left:2px solid var(--neon);
+  padding-left:16px;
+}
+
+.hero-cta{
+  display:flex;gap:16px;flex-wrap:wrap;
+  animation:fadeSlide 0.8s 0.5s ease both;
+}
+
+.btn-main{
+  position:relative;
+  padding:0;border:none;background:none;cursor:none;
+  overflow:hidden;
+}
+.btn-main-inner{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 40px;
+  background:var(--neon);
+  color:#000;
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:0.75rem;letter-spacing:3px;
+  text-transform:uppercase;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:all 0.2s;
+  position:relative;z-index:1;
+}
+.btn-main:hover .btn-main-inner{
+  background:#000;color:var(--neon);
+  box-shadow:0 0 30px var(--neon),inset 0 0 20px rgba(0,255,255,0.1);
+}
+.btn-main::before{
+  content:'';position:absolute;inset:0;
+  background:var(--neon);
+  filter:blur(20px);opacity:0;
+  transition:opacity 0.2s;
+}
+.btn-main:hover::before{opacity:0.4}
+
+.btn-ghost{
+  padding:16px 40px;
+  border:1px solid rgba(0,255,255,0.3);
+  color:rgba(0,255,255,0.7);
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;letter-spacing:3px;
+  text-transform:uppercase;cursor:none;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:all 0.3s;
+  background:transparent;
+}
+.btn-ghost:hover{
+  border-color:var(--neon2);color:var(--neon2);
+  box-shadow:0 0 20px rgba(255,0,255,0.3);
+}
+
+/* ===== HERO RIGHT — HOLOGRAM ===== */
+.hero-right{
+  position:absolute;right:0;top:50%;
+  transform:translateY(-50%);
+  width:55vw;max-width:700px;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+
+.holo-container{
+  position:relative;width:500px;height:500px;
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotateY(0deg)}
+  50%{transform:translateY(-20px) rotateY(5deg)}
+}
+
+.holo-ring{
+  position:absolute;border-radius:50%;
+  border:1px solid;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  animation:ringPulse 3s ease-in-out infinite;
+}
+.r1{width:460px;height:460px;border-color:rgba(0,255,255,0.15);animation-delay:0s}
+.r2{width:380px;height:380px;border-color:rgba(0,255,255,0.25);animation-delay:0.3s}
+.r3{width:300px;height:300px;border-color:rgba(0,255,255,0.4);animation-delay:0.6s}
+.r4{width:200px;height:200px;border-color:rgba(255,0,255,0.3);animation-delay:0.9s}
+@keyframes ringPulse{
+  0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}
+}
+
+.holo-face{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:200px;height:240px;
+}
+
+/* SVG face outline */
+.face-svg{width:100%;height:100%;opacity:0.6}
+
+/* Scan beam */
+.scan-beam{
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  width:460px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);
+  box-shadow:0 0 20px var(--neon),0 0 40px var(--neon);
+  top:0;
+  animation:scanBeam 3s ease-in-out infinite;
+}
+@keyframes scanBeam{
+  0%{top:20px;opacity:0}
+  5%{opacity:1}
+  95%{opacity:1}
+  100%{top:480px;opacity:0}
+}
+
+/* Corner brackets */
+.bracket{position:absolute;width:30px;height:30px}
+.br-tl{top:20px;left:20px;border-top:2px solid var(--neon);border-left:2px solid var(--neon);box-shadow:-5px -5px 10px rgba(0,255,255,0.3)}
+.br-tr{top:20px;right:20px;border-top:2px solid var(--neon);border-right:2px solid var(--neon);box-shadow:5px -5px 10px rgba(0,255,255,0.3)}
+.br-bl{bottom:20px;left:20px;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon);box-shadow:-5px 5px 10px rgba(0,255,255,0.3)}
+.br-br{bottom:20px;right:20px;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon);box-shadow:5px 5px 10px rgba(0,255,255,0.3)}
+
+/* Data readouts */
+.data-readout{
+  position:absolute;
+  font-size:0.55rem;letter-spacing:1.5px;
+  line-height:1.8;
+  text-shadow:0 0 8px currentColor;
+}
+.dr1{top:80px;left:-80px;color:var(--neon);text-align:right}
+.dr2{top:160px;right:-80px;color:var(--neon2)}
+.dr3{bottom:100px;left:-80px;color:var(--neon3);text-align:right}
+.dr4{bottom:60px;right:-80px;color:var(--green)}
+
+/* Alert badge */
+.alert-badge{
+  position:absolute;
+  bottom:30px;left:50%;transform:translateX(-50%);
+  background:rgba(255,34,68,0.1);
+  border:1px solid var(--red);
+  color:var(--red);
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;letter-spacing:3px;
+  padding:10px 24px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  box-shadow:0 0 20px rgba(255,34,68,0.3),inset 0 0 20px rgba(255,34,68,0.05);
+  animation:alertBlink 2s ease-in-out infinite 2s;
+}
+@keyframes alertBlink{
+  0%,100%{opacity:1;box-shadow:0 0 20px rgba(255,34,68,0.3)}
+  50%{opacity:0.4;box-shadow:0 0 5px rgba(255,34,68,0.1)}
+}
+
+.conf-score{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Black Ops One',monospace;
+  font-size:3.5rem;
+  color:transparent;
+  -webkit-text-stroke:1px var(--red);
+  text-shadow:0 0 30px rgba(255,34,68,0.5),0 0 60px rgba(255,34,68,0.2);
+  letter-spacing:4px;
+  animation:confPulse 2s ease-in-out infinite;
+}
+@keyframes confPulse{
+  0%,100%{-webkit-text-stroke:1px var(--red);filter:drop-shadow(0 0 20px var(--red))}
+  50%{-webkit-text-stroke:1px #fff;filter:drop-shadow(0 0 40px #fff)}
+}
+
+/* ===== STATS ===== */
+.stats{
+  position:relative;z-index:10;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(0,255,255,0.1);
+  border-bottom:1px solid rgba(0,255,255,0.1);
+}
+.stat{
+  padding:36px;
+  border-right:1px solid rgba(0,255,255,0.1);
+  position:relative;overflow:hidden;
+  transition:background 0.3s;
+}
+.stat:last-child{border-right:none}
+.stat::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,255,0.05),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.stat:hover::before{opacity:1}
+.stat:hover{background:rgba(0,255,255,0.02)}
+.stat-n{
+  font-family:'Black Ops One',monospace;
+  font-size:3rem;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 10px var(--neon));
+  display:block;
+}
+.stat-l{
+  font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(224,255,255,0.4);margin-top:4px;display:block;
+}
+.stat-bar{
+  height:1px;background:rgba(0,255,255,0.15);margin-top:12px;
+  position:relative;overflow:hidden;
+}
+.stat-bar-fill{
+  position:absolute;top:0;left:0;height:100%;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  box-shadow:0 0 8px var(--neon);
+  animation:barFill 2s ease both;
+}
+@keyframes barFill{from{width:0}}
+
+/* ===== UPLOAD SECTION ===== */
+.upload-section{
+  position:relative;z-index:10;
+  padding:100px 48px;
+}
+
+.section-header{margin-bottom:64px}
+.s-tag{
+  font-size:0.6rem;letter-spacing:5px;text-transform:uppercase;
+  color:var(--neon);text-shadow:0 0 10px var(--neon);
+  margin-bottom:12px;display:block;
+}
+.s-title{
+  font-family:'Black Ops One',monospace;
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1;
+  background:linear-gradient(135deg,#fff 30%,var(--neon));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:16px;
+}
+.s-sub{
+  font-size:0.78rem;line-height:1.9;
+  color:rgba(224,255,255,0.45);
+  max-width:480px;
+}
+
+/* Upload zone */
+.dropzone{
+  position:relative;
+  border:1px solid rgba(0,255,255,0.2);
+  padding:80px 40px;
+  text-align:center;
+  max-width:640px;
+  overflow:hidden;
+  cursor:none;
+  transition:all 0.3s;
+  background:rgba(0,255,255,0.02);
+}
+.dropzone::before,.dropzone::after{
+  content:'';position:absolute;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);
+  height:1px;left:0;right:0;
+  transition:opacity 0.3s;opacity:0;
+}
+.dropzone::before{top:0}
+.dropzone::after{bottom:0}
+.dropzone:hover::before,.dropzone:hover::after{opacity:1;animation:lineScan 2s linear infinite}
+@keyframes lineScan{
+  0%{background-position:-100% 0}100%{background-position:200% 0}
+}
+.dropzone:hover{
+  border-color:rgba(0,255,255,0.5);
+  background:rgba(0,255,255,0.04);
+  box-shadow:0 0 40px rgba(0,255,255,0.1),inset 0 0 40px rgba(0,255,255,0.03);
+}
+
+/* Animated corners on dropzone */
+.dz-corner{position:absolute;width:20px;height:20px;transition:all 0.3s}
+.dz-tl{top:0;left:0;border-top:2px solid var(--neon);border-left:2px solid var(--neon)}
+.dz-tr{top:0;right:0;border-top:2px solid var(--neon);border-right:2px solid var(--neon)}
+.dz-bl{bottom:0;left:0;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon)}
+.dz-br{bottom:0;right:0;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon)}
+.dropzone:hover .dz-tl{top:-2px;left:-2px}
+.dropzone:hover .dz-tr{top:-2px;right:-2px}
+.dropzone:hover .dz-bl{bottom:-2px;left:-2px}
+.dropzone:hover .dz-br{bottom:-2px;right:-2px}
+
+.dz-icon{
+  font-size:3.5rem;margin-bottom:20px;display:block;
+  animation:iconFloat 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px var(--neon));
+}
+@keyframes iconFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.dz-main{
+  font-family:'Orbitron',monospace;
+  font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:8px;letter-spacing:2px;
+}
+.dz-sub{
+  font-size:0.68rem;color:rgba(224,255,255,0.4);
+  letter-spacing:2px;margin-bottom:28px;
+}
+.dz-formats{
+  display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+}
+.fmt-tag{
+  font-size:0.58rem;letter-spacing:2px;padding:5px 12px;
+  border:1px solid rgba(0,255,255,0.2);color:rgba(0,255,255,0.5);
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+  transition:all 0.2s;
+}
+.fmt-tag:hover{border-color:var(--neon);color:var(--neon);box-shadow:0 0 10px rgba(0,255,255,0.2)}
+
+/* Live metrics */
+.metrics-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:2px;background:rgba(0,255,255,0.05);
+  border:1px solid rgba(0,255,255,0.1);
+  margin-top:32px;max-width:640px;
+}
+.metric-item{
+  background:var(--bg);
+  padding:20px 24px;
+  transition:background 0.2s;
+}
+.metric-item:hover{background:rgba(0,255,255,0.03)}
+.metric-label{
+  font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(224,255,255,0.35);margin-bottom:8px;
+}
+.metric-val{
+  font-family:'Orbitron',monospace;
+  font-size:1.4rem;font-weight:700;
+  color:var(--neon);
+  text-shadow:0 0 15px var(--neon);
+}
+.metric-bar{height:2px;background:rgba(0,255,255,0.1);margin-top:8px;position:relative;overflow:hidden}
+.metric-bar-fill{
+  position:absolute;inset-y:0;left:0;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  box-shadow:0 0 8px var(--neon);
+  animation:barFill 2s ease both;
+}
+
+/* ===== FEATURES ===== */
+.features-section{
+  position:relative;z-index:10;
+  padding:100px 48px;
+  border-top:1px solid rgba(0,255,255,0.08);
+}
+
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  background:rgba(0,255,255,0.05);
+  border:1px solid rgba(0,255,255,0.1);
+  margin-top:64px;
+}
+
+.feat-card{
+  background:var(--bg);
+  padding:44px 36px;
+  position:relative;overflow:hidden;
+  transition:all 0.3s;
+  cursor:none;
+}
+.feat-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);
+  transform:translateX(-100%);
+  transition:transform 0.5s;
+}
+.feat-card:hover::before{transform:translateX(100%)}
+.feat-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(0,255,255,0.08),transparent 70%);
+  opacity:0;transition:opacity 0.3s;
+}
+.feat-card:hover::after{opacity:1}
+.feat-card:hover{background:rgba(0,255,255,0.03)}
+
+.feat-num{
+  font-family:'Black Ops One',monospace;
+  font-size:5rem;
+  position:absolute;bottom:-10px;right:16px;
+  color:rgba(0,255,255,0.04);
+  letter-spacing:2px;
+  transition:color 0.3s;
+}
+.feat-card:hover .feat-num{color:rgba(0,255,255,0.08)}
+
+.feat-icon-wrap{
+  width:52px;height:52px;
+  border:1px solid rgba(0,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:24px;
+  position:relative;z-index:1;
+  transition:all 0.3s;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+}
+.feat-card:hover .feat-icon-wrap{
+  border-color:var(--neon);
+  box-shadow:0 0 20px rgba(0,255,255,0.3),inset 0 0 20px rgba(0,255,255,0.1);
+  background:rgba(0,255,255,0.05);
+}
+
+.feat-name{
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:0.85rem;letter-spacing:2px;
+  margin-bottom:12px;color:#fff;
+  position:relative;z-index:1;
+}
+.feat-desc{
+  font-size:0.72rem;line-height:1.8;
+  color:rgba(224,255,255,0.4);
+  position:relative;z-index:1;
+}
+
+/* ===== TECH ===== */
+.tech-section{
+  position:relative;z-index:10;
+  padding:100px 48px;
+  border-top:1px solid rgba(0,255,255,0.08);
+}
+
+.tech-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-top:64px;
+}
+
+.tech-card{
+  border:1px solid rgba(0,255,255,0.1);
+  padding:32px;
+  position:relative;overflow:hidden;
+  transition:all 0.3s;
+  cursor:none;
+  background:linear-gradient(135deg,rgba(0,255,255,0.02),transparent);
+}
+.tech-card:hover{
+  border-color:rgba(0,255,255,0.4);
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,255,255,0.1);
+}
+
+.tc-accent{
+  height:2px;
+  margin-bottom:24px;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  box-shadow:0 0 8px var(--neon);
+  clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);
+}
+.tc-icon{font-size:2rem;margin-bottom:16px;display:block;filter:drop-shadow(0 0 10px var(--neon))}
+.tc-name{
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:0.85rem;letter-spacing:2px;
+  color:#fff;margin-bottom:4px;
+}
+.tc-role{
+  font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--neon);text-shadow:0 0 8px var(--neon);
+  margin-bottom:12px;
+}
+.tc-desc{
+  font-size:0.7rem;line-height:1.8;
+  color:rgba(224,255,255,0.38);
+}
+
+/* ===== TEAM ===== */
+.team-section{
+  position:relative;z-index:10;
+  padding:100px 48px;
+  border-top:1px solid rgba(0,255,255,0.08);
+  background:linear-gradient(180deg,transparent,rgba(0,255,255,0.02),transparent);
+}
+
+.team-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;background:rgba(0,255,255,0.05);
+  border:1px solid rgba(0,255,255,0.1);
+  margin-top:64px;
+}
+
+.team-card{
+  background:var(--bg);padding:44px;
+  position:relative;overflow:hidden;
+  transition:background 0.3s;
+  cursor:none;
+}
+.team-card:hover{background:rgba(0,255,255,0.03)}
+
+.team-avatar-wrap{
+  width:80px;height:80px;
+  border:1px solid rgba(0,255,255,0.2);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;margin-bottom:24px;
+  position:relative;
+  transition:all 0.3s;
+  background:radial-gradient(circle,rgba(0,255,255,0.05),transparent);
+}
+.team-card:hover .team-avatar-wrap{
+  border-color:var(--neon);
+  box-shadow:0 0 30px rgba(0,255,255,0.3),0 0 60px rgba(0,255,255,0.1);
+}
+.team-avatar-wrap::before{
+  content:'';position:absolute;inset:-4px;
+  border-radius:50%;
+  border:1px solid rgba(0,255,255,0.1);
+}
+
+.t-name{
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:1rem;letter-spacing:2px;
+  color:#fff;margin-bottom:4px;
+}
+.t-role{
+  font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--neon2);text-shadow:0 0 8px var(--neon2);
+  margin-bottom:20px;
+}
+.t-skills{display:flex;flex-wrap:wrap;gap:6px}
+.t-skill{
+  font-size:0.56rem;letter-spacing:1.5px;
+  padding:4px 10px;
+  border:1px solid rgba(0,255,255,0.12);
+  color:rgba(0,255,255,0.45);
+  transition:all 0.2s;
+}
+.team-card:hover .t-skill{border-color:rgba(0,255,255,0.25);color:rgba(0,255,255,0.7)}
+
+/* ===== ROADMAP ===== */
+.roadmap-section{
+  position:relative;z-index:10;
+  padding:100px 48px;
+  border-top:1px solid rgba(0,255,255,0.08);
+}
+
+.road-timeline{
+  position:relative;margin-top:64px;
+  padding-left:60px;
+}
+.road-timeline::before{
+  content:'';position:absolute;
+  left:18px;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,var(--neon),var(--neon2),rgba(0,255,255,0.1));
+}
+
+.road-item{
+  position:relative;margin-bottom:48px;
+  animation:fadeSlide 0.6s ease both;
+}
+.road-item::before{
+  content:'';position:absolute;
+  left:-48px;top:8px;
+  width:10px;height:10px;
+  background:rgba(0,255,255,0.1);
+  border:1px solid rgba(0,255,255,0.3);
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  transition:all 0.3s;
+}
+.road-item.done::before{
+  background:var(--green);border-color:var(--green);
+  box-shadow:0 0 15px var(--green);
+}
+.road-item.active::before{
+  background:var(--neon);border-color:var(--neon);
+  box-shadow:0 0 20px var(--neon),0 0 40px rgba(0,255,255,0.3);
+  animation:diamondPulse 1.5s infinite;
+}
+@keyframes diamondPulse{
+  0%,100%{box-shadow:0 0 20px var(--neon)}
+  50%{box-shadow:0 0 40px var(--neon),0 0 80px rgba(0,255,255,0.4)}
+}
+
+.road-box{
+  border:1px solid rgba(0,255,255,0.1);
+  padding:28px 32px;
+  background:rgba(0,255,255,0.02);
+  position:relative;overflow:hidden;
+  transition:all 0.3s;
+  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+}
+.road-item.done .road-box{border-color:rgba(57,255,20,0.2);background:rgba(57,255,20,0.02)}
+.road-item.active .road-box{
+  border-color:rgba(0,255,255,0.3);
+  background:rgba(0,255,255,0.04);
+  box-shadow:0 0 30px rgba(0,255,255,0.08);
+}
+
+.road-phase{
+  font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:6px;
+}
+.road-item.done .road-phase{color:var(--green)}
+.road-item.active .road-phase{color:var(--neon)}
+.road-item .road-phase{color:rgba(224,255,255,0.3)}
+
+.road-title-t{
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:1rem;letter-spacing:2px;
+  color:#fff;margin-bottom:8px;
+}
+.road-desc-t{font-size:0.7rem;line-height:1.8;color:rgba(224,255,255,0.38)}
+
+/* ===== FOOTER ===== */
+footer{
+  position:relative;z-index:10;
+  border-top:1px solid rgba(0,255,255,0.1);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,2,5,0.9);
+}
+.footer-logo-wrap{display:flex;align-items:center;gap:10px}
+.footer-logo-t{
+  font-family:'Orbitron',monospace;
+  font-weight:900;font-size:1rem;letter-spacing:4px;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.footer-copy{font-size:0.6rem;color:rgba(224,255,255,0.25);letter-spacing:2px}
+.footer-right{font-size:0.6rem;color:rgba(0,255,255,0.3);letter-spacing:2px;text-align:right}
+
+@keyframes fadeSlide{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Responsive */
+@media(max-width:900px){
+  .hero-right{display:none}
+  nav{padding:16px 20px}
+  .nav-center{display:none}
+  .hero,.upload-section,.features-section,.tech-section,.team-section,.roadmap-section{padding:60px 20px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .feat-grid,.tech-cards,.team-cards{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:16px;text-align:center;padding:32px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cur"></div>
+<div id="cur2"></div>
+<div id="cur3"></div>
+
+<!-- Scanlines & vignette -->
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<!-- Particle canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-icon">🛡</div>
+    <div class="logo-text">DEEPSHIELD</div>
+  </div>
+  <div class="nav-center">
+    <div class="nav-pill">Détecter</div>
+    <div class="nav-pill">Technologie</div>
+    <div class="nav-pill">Équipe</div>
+    <div class="nav-pill">Roadmap</div>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    SYSTÈME OPÉRATIONNEL
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div style="position:relative;z-index:2">
+    <div class="hero-eyebrow">// Projet IA — Détection de Manipulation Visuelle</div>
+    <h1 class="hero-title">
+      <span class="t1">DETECT</span>
+      <span class="t2">EXPOSE</span>
+      <span class="t3">PROTECT</span>
+    </h1>
+    <p class="hero-sub">
+      DeepShield utilise des réseaux de neurones de pointe<br>
+      pour détecter les images et vidéos falsifiées (deepfakes)<br>
+      avec une précision de <strong style="color:var(--neon)">97.3%</strong> — en moins de 2 secondes.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-main">
+        <div class="btn-main-inner">
+          <span>⚡</span> Analyser maintenant
+        </div>
+      </button>
+      <button class="btn-ghost">▶ Voir la démo</button>
+    </div>
+  </div>
+
+  <!-- HOLOGRAM RIGHT -->
+  <div class="hero-right">
+    <div class="holo-container">
+      <div class="holo-ring r1"></div>
+      <div class="holo-ring r2"></div>
+      <div class="holo-ring r3"></div>
+      <div class="holo-ring r4"></div>
+      <div class="scan-beam"></div>
+
+      <div class="bracket br-tl"></div>
+      <div class="bracket br-tr"></div>
+      <div class="bracket br-bl"></div>
+      <div class="bracket br-br"></div>
+
+      <!-- SVG Face Wireframe -->
+      <div class="holo-face">
+        <svg class="face-svg" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Head outline -->
+          <ellipse cx="100" cy="120" rx="85" ry="105" stroke="rgba(0,255,255,0.4)" stroke-width="0.8"/>
+          <!-- Jaw -->
+          <path d="M 30 150 Q 100 220 170 150" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
+          <!-- Eyes -->
+          <ellipse cx="68" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
+          <ellipse cx="132" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
+          <circle cx="68" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
+          <circle cx="132" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
+          <!-- Nose -->
+          <path d="M 100 95 L 90 130 Q 100 138 110 130 Z" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
+          <!-- Mouth -->
+          <path d="M 75 155 Q 100 170 125 155" stroke="rgba(0,255,255,0.5)" stroke-width="1" fill="none"/>
+          <!-- Mesh lines -->
+          <line x1="15" y1="95" x2="50" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+          <line x1="150" y1="95" x2="185" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+          <line x1="100" y1="15" x2="100" y2="55" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
+          <!-- Landmark dots -->
+          <circle cx="50" cy="80" r="2" fill="rgba(0,255,255,0.6)"/>
+          <circle cx="150" cy="80" r="2" fill="rgba(0,255,255,0.6)"/>
+          <circle cx="68" cy="65" r="2" fill="rgba(0,255,255,0.6)"/>
+          <circle cx="132" cy="65" r="2" fill="rgba(0,255,255,0.6)"/>
+          <circle cx="100" cy="60" r="2" fill="rgba(0,255,255,0.8)"/>
+          <circle cx="75" cy="155" r="2" fill="rgba(255,34,68,0.9)"/>
+          <circle cx="125" cy="155" r="2" fill="rgba(255,34,68,0.9)"/>
+          <circle cx="100" cy="165" r="2" fill="rgba(255,34,68,0.9)"/>
+          <!-- Anomaly highlight -->
+          <ellipse cx="132" cy="95" rx="22" ry="14" stroke="rgba(255,34,68,0.6)" stroke-width="1" stroke-dasharray="3,3">
+            <animateTransform attributeName="transform" type="rotate" from="0 132 95" to="360 132 95" dur="8s" repeatCount="indefinite"/>
+          </ellipse>
+        </svg>
+      </div>
+
+      <div class="data-readout dr1">
+        ANALYSE.FREQ<br>DCT: +2.41σ<br>FFT: ANOMALY<br>CONF: 94.2%
+      </div>
+      <div class="data-readout dr2">
+        GAN.DETECT<br>MODE: ACTIVE<br>SCORE: 0.973<br>STATUS: TRUE
+      </div>
+      <div class="data-readout dr3">
+        MESH.468pts<br>EAR: 0.284<br>GEOM: ±3.2°<br>OK: 97.1%
+      </div>
+      <div class="data-readout dr4">
+        COMPRESS<br>ARTIFACT: YES<br>LEVEL: HIGH<br>BLOCK: 8x8
+      </div>
+
+      <div class="conf-score">97%</div>
+      <div class="alert-badge">⚠ DEEPFAKE DÉTECTÉ</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-n">97.3%</span>
+    <span class="stat-l">Précision du modèle</span>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:97.3%"></div></div>
+  </div>
+  <div class="stat">
+    <span class="stat-n">&lt;2s</span>
+    <span class="stat-l">Temps d'analyse</span>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:85%;animation-delay:0.2s"></div></div>
+  </div>
+  <div class="stat">
+    <span class="stat-n">468</span>
+    <span class="stat-l">Points faciaux analysés</span>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:90%;animation-delay:0.4s"></div></div>
+  </div>
+  <div class="stat">
+    <span class="stat-n">5+</span>
+    <span class="stat-l">Formats supportés</span>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:75%;animation-delay:0.6s"></div></div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<section class="upload-section">
+  <div class="section-header">
+    <span class="s-tag">// 01 — Interface d'analyse</span>
+    <div class="s-title">Déposez.<br>On Analyse.</div>
+    <p class="s-sub">Glissez votre fichier ou cliquez pour uploader. Notre modèle retourne un rapport complet avec score de confiance et heatmap des zones suspectes.</p>
+  </div>
+
+  <div class="dropzone">
+    <div class="dz-corner dz-tl"></div>
+    <div class="dz-corner dz-tr"></div>
+    <div class="dz-corner dz-bl"></div>
+    <div class="dz-corner dz-br"></div>
+    <span class="dz-icon">🔬</span>
+    <div class="dz-main">GLISSER LE FICHIER ICI</div>
+    <div class="dz-sub">ou cliquer pour sélectionner</div>
+    <div class="dz-formats">
+      <span class="fmt-tag">JPG</span>
+      <span class="fmt-tag">PNG</span>
+      <span class="fmt-tag">MP4</span>
+      <span class="fmt-tag">MOV</span>
+      <span class="fmt-tag">AVI</span>
+    </div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-item">
+      <div class="metric-label">Analyse DCT / FFT</div>
+      <div class="metric-val">94%</div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:94%"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Détection GAN Artifacts</div>
+      <div class="metric-val">89%</div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:89%;animation-delay:0.15s"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Géométrie Faciale</div>
+      <div class="metric-val">97%</div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:97%;animation-delay:0.3s"></div></div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Compression Artifacts</div>
+      <div class="metric-val">82%</div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:82%;animation-delay:0.45s"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="section-header">
+    <span class="s-tag">// 02 — Fonctionnalités</span>
+    <div class="s-title">Ce que<br>fait DeepShield</div>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-num">01</div>
+      <div class="feat-icon-wrap">🧠</div>
+      <div class="feat-name">Réseau Neuronal</div>
+      <p class="feat-desc">EfficientNet-B4 fine-tuné sur FaceForensics++ et DFDC. Classification binaire réelle/fausse avec score de confiance.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">02</div>
+      <div class="feat-icon-wrap">📊</div>
+      <div class="feat-name">Analyse Fréquentielle</div>
+      <p class="feat-desc">DCT et FFT pour détecter les artefacts spectraux invisibles laissés par les réseaux génératifs GAN lors de la synthèse.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">03</div>
+      <div class="feat-icon-wrap">🎭</div>
+      <div class="feat-name">Landmarks 468 pts</div>
+      <p class="feat-desc">MediaPipe extrait 468 points faciaux. Analyse géométrique et temporelle pour détecter les incohérences de déformation.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">04</div>
+      <div class="feat-icon-wrap">🎬</div>
+      <div class="feat-name">Vidéo Frame-by-Frame</div>
+      <p class="feat-desc">Extraction intelligente des frames, analyse par batch et graphe temporel du score de détection pour toute la vidéo.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">05</div>
+      <div class="feat-icon-wrap">🗺</div>
+      <div class="feat-name">Heatmap Zones Suspectes</div>
+      <p class="feat-desc">Grad-CAM visualise les zones du visage ayant déclenché la détection. Export rapport PDF complet avec toutes les métriques.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">06</div>
+      <div class="feat-icon-wrap">🔒</div>
+      <div class="feat-name">100% Privé</div>
+      <p class="feat-desc">Aucun fichier stocké sur nos serveurs. Traitement sécurisé côté serveur avec suppression automatique après analyse.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section class="tech-section">
+  <div class="section-header">
+    <span class="s-tag">// 03 — Architecture</span>
+    <div class="s-title">Stack<br>Technique</div>
+  </div>
+
+  <div class="tech-cards">
+    <div class="tech-card">
+      <div class="tc-accent"></div>
+      <span class="tc-icon">🐍</span>
+      <div class="tc-name">Python + FastAPI</div>
+      <div class="tc-role">Backend & API</div>
+      <p class="tc-desc">API REST ultra-rapide avec FastAPI. Gestion des uploads, inférence async, retour des résultats en JSON.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,var(--neon2),var(--neon))"></div>
+      <span class="tc-icon">🔥</span>
+      <div class="tc-name">PyTorch + EfficientNet</div>
+      <div class="tc-role">Deep Learning</div>
+      <p class="tc-desc">EfficientNet-B4 fine-tuné sur FF++. Data augmentation avancée. Export ONNX pour inférence optimisée.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,#61DAFB,var(--neon2))"></div>
+      <span class="tc-icon">⚛️</span>
+      <div class="tc-name">React + Tailwind</div>
+      <div class="tc-role">Frontend</div>
+      <p class="tc-desc">Interface réactive avec drag & drop, visualisation temps réel, Recharts pour les graphes de résultats.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,var(--neon3),var(--green))"></div>
+      <span class="tc-icon">👁</span>
+      <div class="tc-name">OpenCV + MediaPipe</div>
+      <div class="tc-role">Vision</div>
+      <p class="tc-desc">Extraction de frames vidéo, détection faciale robuste, 468 landmarks pour l'analyse géométrique.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,#0db7ed,#326ce5)"></div>
+      <span class="tc-icon">🐋</span>
+      <div class="tc-name">Docker + CI/CD</div>
+      <div class="tc-role">Déploiement</div>
+      <p class="tc-desc">Conteneurisation complète. GitHub Actions pour CI/CD automatisé. Déploiement sur Render ou AWS.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,var(--red),var(--neon2))"></div>
+      <span class="tc-icon">📦</span>
+      <div class="tc-name">FaceForensics++ / DFDC</div>
+      <div class="tc-role">Dataset</div>
+      <p class="tc-desc">Entraînement sur FF++ (1000+ vidéos) et DeepFake Detection Challenge de Meta. 50k+ images synthétiques.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section">
+  <div class="section-header">
+    <span class="s-tag">// 04 — L'équipe</span>
+    <div class="s-title">3 Cerveaux.<br>1 Mission.</div>
+  </div>
+
+  <div class="team-cards">
+    <div class="team-card">
+      <div class="team-avatar-wrap">👨‍💻</div>
+      <div class="t-name">TOI</div>
+      <div class="t-role">UI/UX & Design</div>
+      <div class="t-skills">
+        <span class="t-skill">React</span>
+        <span class="t-skill">CSS</span>
+        <span class="t-skill">Figma</span>
+        <span class="t-skill">Animation</span>
+        <span class="t-skill">Frontend</span>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar-wrap">🧑‍💻</div>
+      <div class="t-name">HADA</div>
+      <div class="t-role">ML Engineer</div>
+      <div class="t-skills">
+        <span class="t-skill">PyTorch</span>
+        <span class="t-skill">EfficientNet</span>
+        <span class="t-skill">Python</span>
+        <span class="t-skill">OpenCV</span>
+        <span class="t-skill">MediaPipe</span>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar-wrap">👩‍💻</div>
+      <div class="t-name">AMI(E)</div>
+      <div class="t-role">Backend & Data</div>
+      <div class="t-skills">
+        <span class="t-skill">FastAPI</span>
+        <span class="t-skill">Docker</span>
+        <span class="t-skill">Datasets</span>
+        <span class="t-skill">Évaluation</span>
+        <span class="t-skill">Rapport</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap-section">
+  <div class="section-header">
+    <span class="s-tag">// 05 — Roadmap</span>
+    <div class="s-title">Plan de<br>Développement</div>
+  </div>
+
+  <div class="road-timeline">
+    <div class="road-item done">
+      <div class="road-box">
+        <div class="road-phase">✓ Phase 1 — Semaines 1-2</div>
+        <div class="road-title-t">Recherche & Architecture</div>
+        <p class="road-desc-t">État de l'art, choix du dataset FaceForensics++, définition de l'architecture EfficientNet-B4, setup environnement.</p>
+      </div>
+    </div>
+    <div class="road-item active">
+      <div class="road-box">
+        <div class="road-phase">→ Phase 2 — Semaines 3-5 [EN COURS]</div>
+        <div class="road-title-t">Entraînement du Modèle</div>
+        <p class="road-desc-t">Préparation dataset, data augmentation, entraînement EfficientNet-B4, évaluation AUC-ROC, optimisation hyperparamètres.</p>
+      </div>
+    </div>
+    <div class="road-item">
+      <div class="road-box">
+        <div class="road-phase">○ Phase 3 — Semaines 6-7</div>
+        <div class="road-title-t">API + Interface</div>
+        <p class="road-desc-t">Développement API FastAPI, interface React avec upload et visualisation résultats, intégration complète frontend-backend.</p>
+      </div>
+    </div>
+    <div class="road-item">
+      <div class="road-box">
+        <div class="road-phase">○ Phase 4 — Semaine 8</div>
+        <div class="road-title-t">Tests, Déploiement & Rapport Final</div>
+        <p class="road-desc-t">Tests unitaires et intégration, conteneurisation Docker, déploiement cloud, rédaction rapport et préparation démo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo-wrap">
+    <div class="logo-icon" style="width:28px;height:28px;font-size:0.8rem">🛡</div>
+    <div class="footer-logo-t">DEEPSHIELD</div>
+  </div>
+  <div class="footer-copy">Projet Académique 2025 — Hada & Équipe</div>
+  <div class="footer-right">Contre la<br>désinformation visuelle</div>
+</footer>
+
+<!-- JS -->
+<script>
+// === CURSOR ===
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2'),cur3=document.getElementById('cur3');
+let mx=0,my=0,r2x=0,r2y=0,r3x=0,r3y=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+function animCursor(){
+  r2x+=(mx-r2x)*0.15;r2y+=(my-r2y)*0.15;
+  r3x+=(mx-r3x)*0.08;r3y+=(my-r3y)*0.08;
+  cur2.style.left=r2x+'px';cur2.style.top=r2y+'px';
+  cur3.style.left=r3x+'px';cur3.style.top=r3y+'px';
+  requestAnimationFrame(animCursor);
+}animCursor();
+
+// === PARTICLE CANVAS ===
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+const PARTICLES=[];
+const COUNT=80;
+
+class Particle{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*canvas.width;
+    this.y=Math.random()*canvas.height;
+    this.vx=(Math.random()-0.5)*0.4;
+    this.vy=(Math.random()-0.5)*0.4;
+    this.alpha=Math.random()*0.4+0.05;
+    this.size=Math.random()*2+0.5;
+    this.color=Math.random()>0.7?'255,0,255':'0,255,255';
+    this.life=1;this.decay=Math.random()*0.003+0.001;
+  }
+  update(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.life-=this.decay;
+    if(this.life<=0||this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.reset();
+  }
+  draw(){
+    ctx.save();
+    ctx.globalAlpha=this.alpha*this.life;
+    ctx.fillStyle=`rgba(${this.color},1)`;
+    ctx.shadowBlur=8;ctx.shadowColor=`rgba(${this.color},0.8)`;
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+}
+
+for(let i=0;i<COUNT;i++)PARTICLES.push(new Particle());
+
+// Grid lines
+function drawGrid(){
+  ctx.strokeStyle='rgba(0,255,255,0.025)';
+  ctx.lineWidth=0.5;
+  const gs=80;
+  for(let x=0;x<canvas.width;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}
+  for(let y=0;y<canvas.height;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
+}
+
+// Connect nearby particles
+function connectParticles(){
+  for(let i=0;i<PARTICLES.length;i++){
+    for(let j=i+1;j<PARTICLES.length;j++){
+      const dx=PARTICLES[i].x-PARTICLES[j].x;
+      const dy=PARTICLES[i].y-PARTICLES[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){
+        ctx.save();
+        ctx.globalAlpha=(1-dist/120)*0.12;
+        ctx.strokeStyle='rgba(0,255,255,1)';
+        ctx.lineWidth=0.5;
+        ctx.beginPath();ctx.moveTo(PARTICLES[i].x,PARTICLES[i].y);ctx.lineTo(PARTICLES[j].x,PARTICLES[j].y);ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawGrid();
+  PARTICLES.forEach(p=>{p.update();p.draw()});
+  connectParticles();
+  requestAnimationFrame(animate);
+}animate();
+
+// === SCROLL FADE IN ===
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      e.target.style.animation=`fadeSlide 0.6s ${i*0.07}s ease both`;
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:0.1});
+
+document.querySelectorAll('.feat-card,.tech-card,.team-card,.stat,.road-item,.metric-item')
+  .forEach(el=>obs.observe(el));
+
+// === GLITCH on title click ===
+document.querySelector('.hero-title').addEventListener('click',function(){
+  this.style.animation='none';
+  this.querySelectorAll('span').forEach(s=>{
+    const orig=s.style.transform||'';
+    s.style.transform=`translate(${(Math.random()-0.5)*20}px,${(Math.random()-0.5)*10}px)`;
+    s.style.filter='hue-rotate(90deg) saturate(3)';
+    setTimeout(()=>{s.style.transform=orig;s.style.filter=''},200);
+  });
+});
+</script>
+</body>
+</html>
