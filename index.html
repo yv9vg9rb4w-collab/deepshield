@@ -143,8 +143,6 @@ nav{
   overflow:hidden;
 }
 
-/* Glitch text */
-.glitch-wrap{position:relative;display:inline-block;margin-bottom:8px}
 .hero-eyebrow{
   font-size:0.65rem;letter-spacing:6px;text-transform:uppercase;
   color:var(--neon2);
@@ -184,7 +182,6 @@ nav{
   animation:fadeSlide 0.8s 0.3s ease both;
 }
 
-/* Glitch effect on hover */
 .hero-title:hover .t1{animation:glitch1 0.3s steps(1) infinite}
 @keyframes glitch1{
   0%{clip-path:inset(0 0 90% 0);transform:translate(-4px,0)}
@@ -294,11 +291,8 @@ nav{
   transform:translate(-50%,-50%);
   width:200px;height:240px;
 }
-
-/* SVG face outline */
 .face-svg{width:100%;height:100%;opacity:0.6}
 
-/* Scan beam */
 .scan-beam{
   position:absolute;
   left:50%;transform:translateX(-50%);
@@ -315,14 +309,12 @@ nav{
   100%{top:480px;opacity:0}
 }
 
-/* Corner brackets */
 .bracket{position:absolute;width:30px;height:30px}
 .br-tl{top:20px;left:20px;border-top:2px solid var(--neon);border-left:2px solid var(--neon);box-shadow:-5px -5px 10px rgba(0,255,255,0.3)}
 .br-tr{top:20px;right:20px;border-top:2px solid var(--neon);border-right:2px solid var(--neon);box-shadow:5px -5px 10px rgba(0,255,255,0.3)}
 .br-bl{bottom:20px;left:20px;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon);box-shadow:-5px 5px 10px rgba(0,255,255,0.3)}
 .br-br{bottom:20px;right:20px;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon);box-shadow:5px 5px 10px rgba(0,255,255,0.3)}
 
-/* Data readouts */
 .data-readout{
   position:absolute;
   font-size:0.55rem;letter-spacing:1.5px;
@@ -334,7 +326,6 @@ nav{
 .dr3{bottom:100px;left:-80px;color:var(--neon3);text-align:right}
 .dr4{bottom:60px;right:-80px;color:var(--green)}
 
-/* Alert badge */
 .alert-badge{
   position:absolute;
   bottom:30px;left:50%;transform:translateX(-50%);
@@ -441,6 +432,33 @@ nav{
   max-width:480px;
 }
 
+/* ===== TAB SWITCHER ===== */
+.tab-switcher{
+  display:flex;gap:2px;margin-bottom:32px;
+  border:1px solid rgba(0,255,255,0.15);
+  background:rgba(0,255,255,0.03);
+  padding:4px;
+  width:fit-content;
+}
+.tab-btn{
+  padding:10px 28px;
+  font-family:'Orbitron',monospace;
+  font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(0,255,255,0.4);
+  border:none;background:transparent;cursor:none;
+  transition:all 0.25s;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+}
+.tab-btn.active{
+  background:rgba(0,255,255,0.12);
+  color:var(--neon);
+  box-shadow:0 0 15px rgba(0,255,255,0.2);
+}
+.tab-btn:hover:not(.active){
+  color:rgba(0,255,255,0.7);
+  background:rgba(0,255,255,0.05);
+}
+
 /* Upload zone */
 .dropzone{
   position:relative;
@@ -452,7 +470,9 @@ nav{
   cursor:none;
   transition:all 0.3s;
   background:rgba(0,255,255,0.02);
+  display:none;
 }
+.dropzone.active-panel{display:block}
 .dropzone::before,.dropzone::after{
   content:'';position:absolute;
   background:linear-gradient(90deg,transparent,var(--neon),transparent);
@@ -461,17 +481,13 @@ nav{
 }
 .dropzone::before{top:0}
 .dropzone::after{bottom:0}
-.dropzone:hover::before,.dropzone:hover::after{opacity:1;animation:lineScan 2s linear infinite}
-@keyframes lineScan{
-  0%{background-position:-100% 0}100%{background-position:200% 0}
-}
+.dropzone:hover::before,.dropzone:hover::after{opacity:1}
 .dropzone:hover{
   border-color:rgba(0,255,255,0.5);
   background:rgba(0,255,255,0.04);
   box-shadow:0 0 40px rgba(0,255,255,0.1),inset 0 0 40px rgba(0,255,255,0.03);
 }
 
-/* Animated corners on dropzone */
 .dz-corner{position:absolute;width:20px;height:20px;transition:all 0.3s}
 .dz-tl{top:0;left:0;border-top:2px solid var(--neon);border-left:2px solid var(--neon)}
 .dz-tr{top:0;right:0;border-top:2px solid var(--neon);border-right:2px solid var(--neon)}
@@ -510,6 +526,163 @@ nav{
   transition:all 0.2s;
 }
 .fmt-tag:hover{border-color:var(--neon);color:var(--neon);box-shadow:0 0 10px rgba(0,255,255,0.2)}
+
+/* ===== URL PANEL ===== */
+.url-panel{
+  max-width:640px;
+  display:none;
+  position:relative;
+}
+.url-panel.active-panel{display:block}
+
+.url-input-wrap{
+  position:relative;
+  border:1px solid rgba(0,255,255,0.2);
+  background:rgba(0,255,255,0.02);
+  display:flex;align-items:center;
+  overflow:hidden;
+  transition:all 0.3s;
+}
+.url-input-wrap:focus-within{
+  border-color:rgba(0,255,255,0.5);
+  box-shadow:0 0 30px rgba(0,255,255,0.1);
+  background:rgba(0,255,255,0.04);
+}
+.url-prefix{
+  font-size:0.65rem;letter-spacing:2px;
+  color:var(--neon);
+  padding:0 16px;
+  white-space:nowrap;
+  border-right:1px solid rgba(0,255,255,0.1);
+  height:64px;display:flex;align-items:center;
+  text-shadow:0 0 8px var(--neon);
+}
+.url-input{
+  flex:1;
+  background:transparent;border:none;outline:none;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.85rem;letter-spacing:1px;
+  color:#e0ffff;
+  padding:0 20px;
+  height:64px;
+  caret-color:var(--neon);
+}
+.url-input::placeholder{color:rgba(224,255,255,0.2)}
+.url-submit{
+  height:64px;padding:0 28px;
+  background:rgba(0,255,255,0.08);
+  border:none;border-left:1px solid rgba(0,255,255,0.15);
+  color:var(--neon);
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;
+  cursor:none;
+  transition:all 0.25s;
+  white-space:nowrap;
+}
+.url-submit:hover{
+  background:rgba(0,255,255,0.15);
+  box-shadow:0 0 20px rgba(0,255,255,0.2);
+}
+
+/* URL corner brackets */
+.url-corners{position:absolute;inset:0;pointer-events:none}
+.url-corner{position:absolute;width:16px;height:16px;transition:all 0.3s}
+.uc-tl{top:0;left:0;border-top:2px solid var(--neon);border-left:2px solid var(--neon)}
+.uc-tr{top:0;right:0;border-top:2px solid var(--neon);border-right:2px solid var(--neon)}
+.uc-bl{bottom:0;left:0;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon)}
+.uc-br{bottom:0;right:0;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon)}
+
+.url-hint{
+  margin-top:16px;
+  font-size:0.6rem;letter-spacing:2px;
+  color:rgba(224,255,255,0.25);
+  display:flex;gap:20px;flex-wrap:wrap;
+}
+.url-hint span{display:flex;align-items:center;gap:6px;color:rgba(0,255,255,0.35)}
+
+/* ===== URL RESULT ===== */
+.url-result{
+  margin-top:24px;
+  border:1px solid rgba(0,255,255,0.1);
+  background:rgba(0,255,255,0.02);
+  padding:28px 32px;
+  max-width:640px;
+  display:none;
+  position:relative;
+  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+}
+.url-result.visible{display:block;animation:fadeSlide 0.4s ease both}
+.url-result.fake{border-color:rgba(255,34,68,0.4);background:rgba(255,34,68,0.03)}
+.url-result.real{border-color:rgba(57,255,20,0.3);background:rgba(57,255,20,0.02)}
+
+.res-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;
+}
+.res-verdict{
+  font-family:'Orbitron',monospace;
+  font-weight:700;font-size:1.1rem;letter-spacing:3px;
+}
+.res-verdict.fake{color:var(--red);text-shadow:0 0 20px var(--red)}
+.res-verdict.real{color:var(--green);text-shadow:0 0 20px var(--green)}
+.res-score{
+  font-family:'Black Ops One',monospace;
+  font-size:2.5rem;letter-spacing:2px;
+}
+.res-score.fake{color:var(--red)}
+.res-score.real{color:var(--green)}
+
+.res-url-display{
+  font-size:0.65rem;letter-spacing:1px;
+  color:rgba(224,255,255,0.35);
+  margin-bottom:16px;
+  word-break:break-all;
+  padding:8px 12px;
+  border-left:2px solid rgba(0,255,255,0.2);
+}
+
+.res-bars{display:flex;flex-direction:column;gap:10px}
+.res-bar-row{display:flex;align-items:center;gap:12px}
+.res-bar-label{font-size:0.58rem;letter-spacing:1.5px;color:rgba(224,255,255,0.35);width:160px;flex-shrink:0}
+.res-bar-track{flex:1;height:4px;background:rgba(0,255,255,0.08);position:relative;overflow:hidden}
+.res-bar-fill{position:absolute;top:0;left:0;height:100%;transition:width 0.8s ease}
+.res-bar-val{font-size:0.65rem;font-family:'Orbitron',monospace;width:40px;text-align:right;flex-shrink:0}
+
+/* Scanning animation */
+.url-scanning{
+  display:none;
+  margin-top:24px;max-width:640px;
+  border:1px solid rgba(0,255,255,0.15);
+  padding:32px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.url-scanning.active{display:block;animation:fadeSlide 0.3s ease both}
+.scan-line{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);
+  box-shadow:0 0 15px var(--neon);
+  animation:scanAnim 1.5s ease-in-out infinite;
+}
+@keyframes scanAnim{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+.scan-text{
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;letter-spacing:3px;color:var(--neon);
+  text-shadow:0 0 10px var(--neon);
+  animation:pulse 1s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.scan-steps{
+  margin-top:16px;
+  display:flex;flex-direction:column;gap:6px;
+  text-align:left;
+}
+.scan-step{
+  font-size:0.6rem;letter-spacing:1.5px;color:rgba(0,255,255,0.3);
+  display:flex;align-items:center;gap:8px;
+}
+.scan-step.done{color:var(--green)}
+.scan-step.running{color:var(--neon);animation:pulse 0.8s infinite}
+.step-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 /* Live metrics */
 .metrics-grid{
@@ -789,10 +962,7 @@ nav{
   box-shadow:0 0 30px rgba(0,255,255,0.08);
 }
 
-.road-phase{
-  font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;
-  margin-bottom:6px;
-}
+.road-phase{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
 .road-item.done .road-phase{color:var(--green)}
 .road-item.active .road-phase{color:var(--neon)}
 .road-item .road-phase{color:rgba(224,255,255,0.3)}
@@ -836,21 +1006,19 @@ footer{
   .stats{grid-template-columns:repeat(2,1fr)}
   .feat-grid,.tech-cards,.team-cards{grid-template-columns:1fr}
   footer{flex-direction:column;gap:16px;text-align:center;padding:32px 20px}
+  .tab-switcher{flex-direction:column;width:100%}
+  .tab-btn{text-align:center}
 }
 </style>
 </head>
 <body>
 
-<!-- Custom cursor -->
 <div id="cur"></div>
 <div id="cur2"></div>
 <div id="cur3"></div>
 
-<!-- Scanlines & vignette -->
 <div class="scanlines"></div>
 <div class="vignette"></div>
-
-<!-- Particle canvas -->
 <canvas id="bg-canvas"></canvas>
 
 <!-- NAV -->
@@ -882,7 +1050,7 @@ footer{
     </h1>
     <p class="hero-sub">
       DeepShield utilise des réseaux de neurones de pointe<br>
-      pour détecter les images et vidéos falsifiées (deepfakes)<br>
+      pour détecter les images, vidéos et URLs falsifiées<br>
       avec une précision de <strong style="color:var(--neon)">97.3%</strong> — en moins de 2 secondes.
     </p>
     <div class="hero-cta">
@@ -895,7 +1063,7 @@ footer{
     </div>
   </div>
 
-  <!-- HOLOGRAM RIGHT -->
+  <!-- HOLOGRAM -->
   <div class="hero-right">
     <div class="holo-container">
       <div class="holo-ring r1"></div>
@@ -903,33 +1071,23 @@ footer{
       <div class="holo-ring r3"></div>
       <div class="holo-ring r4"></div>
       <div class="scan-beam"></div>
-
       <div class="bracket br-tl"></div>
       <div class="bracket br-tr"></div>
       <div class="bracket br-bl"></div>
       <div class="bracket br-br"></div>
-
-      <!-- SVG Face Wireframe -->
       <div class="holo-face">
         <svg class="face-svg" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Head outline -->
           <ellipse cx="100" cy="120" rx="85" ry="105" stroke="rgba(0,255,255,0.4)" stroke-width="0.8"/>
-          <!-- Jaw -->
           <path d="M 30 150 Q 100 220 170 150" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
-          <!-- Eyes -->
           <ellipse cx="68" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
           <ellipse cx="132" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
           <circle cx="68" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
           <circle cx="132" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
-          <!-- Nose -->
           <path d="M 100 95 L 90 130 Q 100 138 110 130 Z" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
-          <!-- Mouth -->
           <path d="M 75 155 Q 100 170 125 155" stroke="rgba(0,255,255,0.5)" stroke-width="1" fill="none"/>
-          <!-- Mesh lines -->
           <line x1="15" y1="95" x2="50" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
           <line x1="150" y1="95" x2="185" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
           <line x1="100" y1="15" x2="100" y2="55" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
-          <!-- Landmark dots -->
           <circle cx="50" cy="80" r="2" fill="rgba(0,255,255,0.6)"/>
           <circle cx="150" cy="80" r="2" fill="rgba(0,255,255,0.6)"/>
           <circle cx="68" cy="65" r="2" fill="rgba(0,255,255,0.6)"/>
@@ -938,26 +1096,15 @@ footer{
           <circle cx="75" cy="155" r="2" fill="rgba(255,34,68,0.9)"/>
           <circle cx="125" cy="155" r="2" fill="rgba(255,34,68,0.9)"/>
           <circle cx="100" cy="165" r="2" fill="rgba(255,34,68,0.9)"/>
-          <!-- Anomaly highlight -->
           <ellipse cx="132" cy="95" rx="22" ry="14" stroke="rgba(255,34,68,0.6)" stroke-width="1" stroke-dasharray="3,3">
             <animateTransform attributeName="transform" type="rotate" from="0 132 95" to="360 132 95" dur="8s" repeatCount="indefinite"/>
           </ellipse>
         </svg>
       </div>
-
-      <div class="data-readout dr1">
-        ANALYSE.FREQ<br>DCT: +2.41σ<br>FFT: ANOMALY<br>CONF: 94.2%
-      </div>
-      <div class="data-readout dr2">
-        GAN.DETECT<br>MODE: ACTIVE<br>SCORE: 0.973<br>STATUS: TRUE
-      </div>
-      <div class="data-readout dr3">
-        MESH.468pts<br>EAR: 0.284<br>GEOM: ±3.2°<br>OK: 97.1%
-      </div>
-      <div class="data-readout dr4">
-        COMPRESS<br>ARTIFACT: YES<br>LEVEL: HIGH<br>BLOCK: 8x8
-      </div>
-
+      <div class="data-readout dr1">ANALYSE.FREQ<br>DCT: +2.41σ<br>FFT: ANOMALY<br>CONF: 94.2%</div>
+      <div class="data-readout dr2">GAN.DETECT<br>MODE: ACTIVE<br>SCORE: 0.973<br>STATUS: TRUE</div>
+      <div class="data-readout dr3">MESH.468pts<br>EAR: 0.284<br>GEOM: ±3.2°<br>OK: 97.1%</div>
+      <div class="data-readout dr4">COMPRESS<br>ARTIFACT: YES<br>LEVEL: HIGH<br>BLOCK: 8x8</div>
       <div class="conf-score">97%</div>
       <div class="alert-badge">⚠ DEEPFAKE DÉTECTÉ</div>
     </div>
@@ -982,8 +1129,8 @@ footer{
     <div class="stat-bar"><div class="stat-bar-fill" style="width:90%;animation-delay:0.4s"></div></div>
   </div>
   <div class="stat">
-    <span class="stat-n">5+</span>
-    <span class="stat-l">Formats supportés</span>
+    <span class="stat-n">3+</span>
+    <span class="stat-l">Modes d'analyse</span>
     <div class="stat-bar"><div class="stat-bar-fill" style="width:75%;animation-delay:0.6s"></div></div>
   </div>
 </div>
@@ -992,11 +1139,18 @@ footer{
 <section class="upload-section">
   <div class="section-header">
     <span class="s-tag">// 01 — Interface d'analyse</span>
-    <div class="s-title">Déposez.<br>On Analyse.</div>
-    <p class="s-sub">Glissez votre fichier ou cliquez pour uploader. Notre modèle retourne un rapport complet avec score de confiance et heatmap des zones suspectes.</p>
+    <div class="s-title">Déposez.<br>Collez. Analysez.</div>
+    <p class="s-sub">Glissez votre fichier, uploadez une image/vidéo, ou collez directement une URL. Notre modèle retourne un rapport complet avec score de confiance et heatmap des zones suspectes.</p>
   </div>
 
-  <div class="dropzone">
+  <!-- TAB SWITCHER -->
+  <div class="tab-switcher">
+    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')">📁 Fichier</button>
+    <button class="tab-btn" id="tab-url" onclick="switchTab('url')">🔗 URL</button>
+  </div>
+
+  <!-- FILE PANEL -->
+  <div class="dropzone active-panel" id="panel-file">
     <div class="dz-corner dz-tl"></div>
     <div class="dz-corner dz-tr"></div>
     <div class="dz-corner dz-bl"></div>
@@ -1013,6 +1167,61 @@ footer{
     </div>
   </div>
 
+  <!-- URL PANEL -->
+  <div class="url-panel" id="panel-url">
+    <div class="url-input-wrap" style="position:relative">
+      <div class="url-corners">
+        <div class="url-corner uc-tl"></div>
+        <div class="url-corner uc-tr"></div>
+        <div class="url-corner uc-bl"></div>
+        <div class="url-corner uc-br"></div>
+      </div>
+      <div class="url-prefix">URL://</div>
+      <input
+        class="url-input"
+        id="url-input"
+        type="text"
+        placeholder="https://exemple.com/image.jpg  —  ou lien vidéo/page"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="url-submit" id="url-submit-btn" onclick="analyzeUrl()">⚡ Analyser</button>
+    </div>
+    <div class="url-hint">
+      <span>🖼 Image directe</span>
+      <span>🎬 Vidéo en ligne</span>
+      <span>🌐 Page web</span>
+      <span>📸 Post réseau social</span>
+    </div>
+
+    <!-- Scanning state -->
+    <div class="url-scanning" id="url-scanning">
+      <div class="scan-line"></div>
+      <div class="scan-text">ANALYSE EN COURS...</div>
+      <div class="scan-steps" id="scan-steps">
+        <div class="scan-step" id="step-1"><div class="step-dot"></div>Résolution de l'URL</div>
+        <div class="scan-step" id="step-2"><div class="step-dot"></div>Extraction du contenu visuel</div>
+        <div class="scan-step" id="step-3"><div class="step-dot"></div>Analyse DCT / FFT fréquentielle</div>
+        <div class="scan-step" id="step-4"><div class="step-dot"></div>Détection GAN artifacts</div>
+        <div class="scan-step" id="step-5"><div class="step-dot"></div>Analyse géométrie faciale</div>
+        <div class="scan-step" id="step-6"><div class="step-dot"></div>Calcul score de confiance</div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="url-result" id="url-result">
+      <div class="res-header">
+        <div>
+          <div class="res-verdict" id="res-verdict"></div>
+          <div class="res-url-display" id="res-url-display"></div>
+        </div>
+        <div class="res-score" id="res-score"></div>
+      </div>
+      <div class="res-bars" id="res-bars"></div>
+    </div>
+  </div>
+
+  <!-- Metrics (always visible) -->
   <div class="metrics-grid">
     <div class="metric-item">
       <div class="metric-label">Analyse DCT / FFT</div>
@@ -1071,12 +1280,24 @@ footer{
     </div>
     <div class="feat-card">
       <div class="feat-num">05</div>
+      <div class="feat-icon-wrap">🔗</div>
+      <div class="feat-name">Analyse par URL</div>
+      <p class="feat-desc">Collez directement un lien image, vidéo ou page web. DeepShield extrait et analyse automatiquement le contenu visuel sans téléchargement.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">06</div>
       <div class="feat-icon-wrap">🗺</div>
       <div class="feat-name">Heatmap Zones Suspectes</div>
       <p class="feat-desc">Grad-CAM visualise les zones du visage ayant déclenché la détection. Export rapport PDF complet avec toutes les métriques.</p>
     </div>
     <div class="feat-card">
-      <div class="feat-num">06</div>
+      <div class="feat-num">07</div>
+      <div class="feat-icon-wrap">🌐</div>
+      <div class="feat-name">Scan de Pages Web</div>
+      <p class="feat-desc">Analyse de l'intégralité d'une page : toutes les images et vidéos embarquées sont scannées et un rapport global est généré.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">08</div>
       <div class="feat-icon-wrap">🔒</div>
       <div class="feat-name">100% Privé</div>
       <p class="feat-desc">Aucun fichier stocké sur nos serveurs. Traitement sécurisé côté serveur avec suppression automatique après analyse.</p>
@@ -1097,7 +1318,7 @@ footer{
       <span class="tc-icon">🐍</span>
       <div class="tc-name">Python + FastAPI</div>
       <div class="tc-role">Backend & API</div>
-      <p class="tc-desc">API REST ultra-rapide avec FastAPI. Gestion des uploads, inférence async, retour des résultats en JSON.</p>
+      <p class="tc-desc">API REST ultra-rapide avec FastAPI. Gestion des uploads, scraping d'URLs, inférence async, retour des résultats en JSON.</p>
     </div>
     <div class="tech-card">
       <div class="tc-accent" style="background:linear-gradient(90deg,var(--neon2),var(--neon))"></div>
@@ -1111,7 +1332,7 @@ footer{
       <span class="tc-icon">⚛️</span>
       <div class="tc-name">React + Tailwind</div>
       <div class="tc-role">Frontend</div>
-      <p class="tc-desc">Interface réactive avec drag & drop, visualisation temps réel, Recharts pour les graphes de résultats.</p>
+      <p class="tc-desc">Interface réactive avec drag & drop, saisie URL, visualisation temps réel, Recharts pour les graphes de résultats.</p>
     </div>
     <div class="tech-card">
       <div class="tc-accent" style="background:linear-gradient(90deg,var(--neon3),var(--green))"></div>
@@ -1119,6 +1340,13 @@ footer{
       <div class="tc-name">OpenCV + MediaPipe</div>
       <div class="tc-role">Vision</div>
       <p class="tc-desc">Extraction de frames vidéo, détection faciale robuste, 468 landmarks pour l'analyse géométrique.</p>
+    </div>
+    <div class="tech-card">
+      <div class="tc-accent" style="background:linear-gradient(90deg,var(--neon),var(--neon3))"></div>
+      <span class="tc-icon">🕷</span>
+      <div class="tc-name">Playwright + BeautifulSoup</div>
+      <div class="tc-role">Scraping URL</div>
+      <p class="tc-desc">Extraction automatique du contenu visuel depuis n'importe quelle URL : images, vidéos, iframes. Rendu JS complet pour les SPAs.</p>
     </div>
     <div class="tech-card">
       <div class="tc-accent" style="background:linear-gradient(90deg,#0db7ed,#326ce5)"></div>
@@ -1177,7 +1405,7 @@ footer{
         <span class="t-skill">FastAPI</span>
         <span class="t-skill">Docker</span>
         <span class="t-skill">Datasets</span>
-        <span class="t-skill">Évaluation</span>
+        <span class="t-skill">Playwright</span>
         <span class="t-skill">Rapport</span>
       </div>
     </div>
@@ -1209,8 +1437,8 @@ footer{
     <div class="road-item">
       <div class="road-box">
         <div class="road-phase">○ Phase 3 — Semaines 6-7</div>
-        <div class="road-title-t">API + Interface</div>
-        <p class="road-desc-t">Développement API FastAPI, interface React avec upload et visualisation résultats, intégration complète frontend-backend.</p>
+        <div class="road-title-t">API + Interface + Module URL</div>
+        <p class="road-desc-t">Développement API FastAPI, interface React avec upload et saisie URL, scraping Playwright, intégration complète frontend-backend.</p>
       </div>
     </div>
     <div class="road-item">
@@ -1233,7 +1461,6 @@ footer{
   <div class="footer-right">Contre la<br>désinformation visuelle</div>
 </footer>
 
-<!-- JS -->
 <script>
 // === CURSOR ===
 const cur=document.getElementById('cur'),cur2=document.getElementById('cur2'),cur3=document.getElementById('cur3');
@@ -1285,16 +1512,13 @@ class Particle{
 
 for(let i=0;i<COUNT;i++)PARTICLES.push(new Particle());
 
-// Grid lines
 function drawGrid(){
-  ctx.strokeStyle='rgba(0,255,255,0.025)';
-  ctx.lineWidth=0.5;
+  ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=0.5;
   const gs=80;
   for(let x=0;x<canvas.width;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}
   for(let y=0;y<canvas.height;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
 }
 
-// Connect nearby particles
 function connectParticles(){
   for(let i=0;i<PARTICLES.length;i++){
     for(let j=i+1;j<PARTICLES.length;j++){
@@ -1304,8 +1528,7 @@ function connectParticles(){
       if(dist<120){
         ctx.save();
         ctx.globalAlpha=(1-dist/120)*0.12;
-        ctx.strokeStyle='rgba(0,255,255,1)';
-        ctx.lineWidth=0.5;
+        ctx.strokeStyle='rgba(0,255,255,1)';ctx.lineWidth=0.5;
         ctx.beginPath();ctx.moveTo(PARTICLES[i].x,PARTICLES[i].y);ctx.lineTo(PARTICLES[j].x,PARTICLES[j].y);ctx.stroke();
         ctx.restore();
       }
@@ -1330,19 +1553,118 @@ const obs=new IntersectionObserver(entries=>{
     }
   });
 },{threshold:0.1});
+document.querySelectorAll('.feat-card,.tech-card,.team-card,.stat,.road-item,.metric-item').forEach(el=>obs.observe(el));
 
-document.querySelectorAll('.feat-card,.tech-card,.team-card,.stat,.road-item,.metric-item')
-  .forEach(el=>obs.observe(el));
-
-// === GLITCH on title click ===
+// === GLITCH ===
 document.querySelector('.hero-title').addEventListener('click',function(){
   this.style.animation='none';
   this.querySelectorAll('span').forEach(s=>{
-    const orig=s.style.transform||'';
     s.style.transform=`translate(${(Math.random()-0.5)*20}px,${(Math.random()-0.5)*10}px)`;
     s.style.filter='hue-rotate(90deg) saturate(3)';
-    setTimeout(()=>{s.style.transform=orig;s.style.filter=''},200);
+    setTimeout(()=>{s.style.transform='';s.style.filter=''},200);
   });
+});
+
+// === TAB SWITCHER ===
+function switchTab(tab) {
+  document.getElementById('panel-file').classList.remove('active-panel');
+  document.getElementById('panel-url').classList.remove('active-panel');
+  document.getElementById('tab-file').classList.remove('active');
+  document.getElementById('tab-url').classList.remove('active');
+
+  document.getElementById('panel-' + tab).classList.add('active-panel');
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  // Reset URL state when switching back
+  if(tab === 'file') {
+    document.getElementById('url-scanning').classList.remove('active');
+    document.getElementById('url-result').classList.remove('visible');
+  }
+}
+
+// === URL ANALYSIS (demo simulation) ===
+function analyzeUrl() {
+  const url = document.getElementById('url-input').value.trim();
+  if (!url) return;
+
+  // Reset
+  const scanning = document.getElementById('url-scanning');
+  const result = document.getElementById('url-result');
+  result.classList.remove('visible','fake','real');
+  scanning.classList.add('active');
+
+  // Reset steps
+  const steps = ['step-1','step-2','step-3','step-4','step-5','step-6'];
+  steps.forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('done','running');
+  });
+
+  // Animate steps sequentially
+  let idx = 0;
+  function nextStep() {
+    if(idx > 0) document.getElementById(steps[idx-1]).classList.replace('running','done');
+    if(idx < steps.length) {
+      document.getElementById(steps[idx]).classList.add('running');
+      idx++;
+      setTimeout(nextStep, 350 + Math.random()*200);
+    } else {
+      // Done — show result
+      setTimeout(() => {
+        scanning.classList.remove('active');
+        showResult(url);
+      }, 400);
+    }
+  }
+  nextStep();
+}
+
+function showResult(url) {
+  // Deterministic "fake" detection based on URL hash for demo
+  const hash = url.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const isFake = (hash % 3) !== 0;
+
+  const metrics = [
+    {label:'Analyse DCT / FFT', val: isFake ? 91+Math.floor(Math.random()*8) : 12+Math.floor(Math.random()*15), color: isFake ? '#ff2244' : '#39ff14'},
+    {label:'GAN Artifacts', val: isFake ? 87+Math.floor(Math.random()*10) : 8+Math.floor(Math.random()*12), color: isFake ? '#ff2244' : '#39ff14'},
+    {label:'Géométrie Faciale', val: isFake ? 93+Math.floor(Math.random()*6) : 5+Math.floor(Math.random()*10), color: isFake ? '#ff2244' : '#39ff14'},
+    {label:'Compression Artifacts', val: isFake ? 78+Math.floor(Math.random()*15) : 15+Math.floor(Math.random()*20), color: isFake ? '#ff2244' : '#39ff14'},
+  ];
+
+  const globalScore = Math.round(metrics.reduce((a,m)=>a+m.val,0)/metrics.length);
+
+  const result = document.getElementById('url-result');
+  const verdict = document.getElementById('res-verdict');
+  const scoreEl = document.getElementById('res-score');
+  const urlDisplay = document.getElementById('res-url-display');
+  const barsEl = document.getElementById('res-bars');
+
+  result.classList.add(isFake ? 'fake' : 'real');
+  verdict.textContent = isFake ? '⚠ DEEPFAKE DÉTECTÉ' : '✓ CONTENU AUTHENTIQUE';
+  verdict.className = 'res-verdict ' + (isFake ? 'fake' : 'real');
+  scoreEl.textContent = globalScore + '%';
+  scoreEl.className = 'res-score ' + (isFake ? 'fake' : 'real');
+
+  const shortUrl = url.length > 60 ? url.slice(0,57)+'...' : url;
+  urlDisplay.textContent = '▸ ' + shortUrl;
+
+  barsEl.innerHTML = metrics.map(m => `
+    <div class="res-bar-row">
+      <div class="res-bar-label">${m.label}</div>
+      <div class="res-bar-track">
+        <div class="res-bar-fill" style="width:${m.val}%;background:${m.color};box-shadow:0 0 8px ${m.color}"></div>
+      </div>
+      <div class="res-bar-val" style="color:${m.color}">${m.val}%</div>
+    </div>
+  `).join('');
+
+  result.classList.add('visible');
+  result.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// Allow Enter key on URL input
+document.getElementById('url-input').addEventListener('keydown', e => {
+  if(e.key === 'Enter') analyzeUrl();
 });
 </script>
 </body>
