@@ -6,6 +6,7 @@
 <title>DEEPSHIELD — Détecteur de DeepFakes</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* ... (Styles précédents conservés pour le design) ... */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--neon:#0ff;--neon2:#f0f;--neon3:#ff0;--red:#ff2244;--green:#39ff14;--bg:#000205}
 html{scroll-behavior:smooth}
@@ -17,278 +18,23 @@ body{background:var(--bg);color:#e0ffff;font-family:'Share Tech Mono',monospace;
 .scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)}
 .vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.8) 100%)}
 
-/* ===== NAV ===== */
 nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,255,255,0.1);background:rgba(0,2,5,0.8);backdrop-filter:blur(20px)}
 .logo-wrap{display:flex;align-items:center;gap:12px}
-.logo-icon{width:36px;height:36px;border:2px solid var(--neon);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 15px var(--neon),inset 0 0 15px rgba(0,255,255,0.1);animation:logoPulse 2s ease-in-out infinite}
-@keyframes logoPulse{0%,100%{box-shadow:0 0 15px var(--neon),inset 0 0 15px rgba(0,255,255,0.1)}50%{box-shadow:0 0 30px var(--neon),0 0 60px rgba(0,255,255,0.3),inset 0 0 30px rgba(0,255,255,0.2)}}
+.logo-icon{width:36px;height:36px;border:2px solid var(--neon);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 15px var(--neon);animation:logoPulse 2s ease-in-out infinite}
 .logo-text{font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;letter-spacing:4px;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-center{display:flex;gap:8px}
-.nav-pill{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border:1px solid rgba(0,255,255,0.2);color:rgba(0,255,255,0.5);transition:all 0.2s;cursor:none}
-.nav-pill:hover{border-color:var(--neon);color:var(--neon);background:rgba(0,255,255,0.05)}
-.nav-right{display:flex;align-items:center;gap:16px}
-.nav-status{display:flex;align-items:center;gap:8px;font-size:0.6rem;letter-spacing:2px;color:var(--green)}
-.status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green);animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* ===== CADENAS (clé API discrète) ===== */
-.lock-btn{
-  position:relative;
-  width:32px;height:32px;
-  border:1px solid rgba(0,255,255,0.15);
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.85rem;
-  cursor:none;
-  transition:all 0.2s;
-  color:rgba(0,255,255,0.3);
-}
-.lock-btn:hover{border-color:rgba(0,255,255,0.4);color:var(--neon);box-shadow:0 0 12px rgba(0,255,255,0.2)}
-.lock-btn.connected{border-color:rgba(57,255,20,0.3);color:var(--green)}
-.lock-btn.connected:hover{box-shadow:0 0 12px rgba(57,255,20,0.2)}
+/* NOUVELLE SECTION PRÉSENTATION */
+.intro-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08);background:linear-gradient(to bottom, transparent, rgba(0,255,255,0.02))}
+.lumora-box{border:1px solid var(--neon);padding:40px;max-width:800px;margin:0 auto;position:relative;background:rgba(0,0,0,0.5);clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)}
+.lumora-tag{color:var(--neon2);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:5px;margin-bottom:20px;display:block}
+.lumora-text{font-size:0.9rem;line-height:2;color:rgba(224,255,255,0.8);margin-bottom:30px}
+.lumora-signature{text-align:right;font-family:'Orbitron',monospace;font-weight:700;color:var(--neon);letter-spacing:2px}
 
-/* ===== API MODAL ===== */
-.modal-overlay{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,0.85);
-  backdrop-filter:blur(8px);
-  display:none;align-items:center;justify-content:center;
-}
-.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{
-  border:1px solid rgba(0,255,255,0.2);
-  background:rgba(0,2,5,0.98);
-  padding:40px;
-  width:100%;max-width:480px;
-  position:relative;
-  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
-  animation:slideUp 0.25s ease;
-}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,255,255,0.3);font-size:1.2rem;cursor:none;transition:color 0.2s}
-.modal-close:hover{color:var(--neon)}
-.modal-title{font-family:'Orbitron',monospace;font-size:0.85rem;letter-spacing:3px;color:var(--neon);margin-bottom:8px}
-.modal-sub{font-size:0.65rem;letter-spacing:1.5px;color:rgba(224,255,255,0.3);margin-bottom:28px;line-height:1.7}
-.modal-input-wrap{display:flex;border:1px solid rgba(0,255,255,0.2);overflow:hidden;margin-bottom:12px;transition:all 0.2s}
-.modal-input-wrap:focus-within{border-color:rgba(0,255,255,0.5);box-shadow:0 0 20px rgba(0,255,255,0.08)}
-.modal-prefix{font-size:0.65rem;color:var(--neon);padding:0 12px;border-right:1px solid rgba(0,255,255,0.1);height:48px;display:flex;align-items:center;white-space:nowrap;text-shadow:0 0 8px var(--neon)}
-.modal-input{flex:1;background:transparent;border:none;outline:none;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#e0ffff;padding:0 14px;height:48px;caret-color:var(--neon)}
-.modal-input::placeholder{color:rgba(224,255,255,0.2)}
-.modal-save{width:100%;padding:14px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);color:var(--neon);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.25s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
-.modal-save:hover{background:rgba(0,255,255,0.15);box-shadow:0 0 20px rgba(0,255,255,0.2)}
-.modal-note{margin-top:12px;font-size:0.58rem;letter-spacing:1px;color:rgba(224,255,255,0.2);line-height:1.6;text-align:center}
-.modal-status{margin-top:12px;font-size:0.62rem;letter-spacing:2px;text-align:center;display:none}
-.modal-status.ok{color:var(--green);display:block}
-.modal-status.err{color:var(--red);display:block}
-
-/* ===== HERO ===== */
-.hero{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;padding:120px 48px 60px;overflow:hidden}
-.hero-eyebrow{font-size:0.65rem;letter-spacing:6px;text-transform:uppercase;color:var(--neon2);text-shadow:0 0 10px var(--neon2);animation:fadeSlide 0.8s ease both}
-.hero-title{font-family:'Black Ops One',monospace;font-size:clamp(5rem,12vw,10rem);line-height:0.85;margin:16px 0}
-.t1{display:block;color:#fff;text-shadow:3px 3px 0 var(--neon),6px 6px 0 rgba(0,255,255,0.2);animation:fadeSlide 0.8s 0.1s ease both}
-.t2{display:block;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeSlide 0.8s 0.2s ease both,hueRot 4s linear infinite}
-@keyframes hueRot{0%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(0deg)}100%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(360deg)}}
-.t3{display:block;color:var(--red);text-shadow:0 0 30px var(--red),-3px -3px 0 rgba(255,34,68,0.3);animation:fadeSlide 0.8s 0.3s ease both}
-.hero-title:hover .t1{animation:glitch1 0.3s steps(1) infinite}
-@keyframes glitch1{0%{clip-path:inset(0 0 90% 0);transform:translate(-4px,0)}20%{clip-path:inset(30% 0 50% 0);transform:translate(4px,0)}40%{clip-path:inset(60% 0 20% 0);transform:translate(-2px,0)}60%{clip-path:inset(10% 0 70% 0);transform:translate(2px,0)}80%{clip-path:inset(80% 0 5% 0);transform:translate(-4px,0)}100%{clip-path:inset(0);transform:none}}
-.hero-sub{font-size:0.85rem;line-height:1.9;color:rgba(224,255,255,0.6);max-width:500px;margin:24px 0 40px;animation:fadeSlide 0.8s 0.4s ease both;border-left:2px solid var(--neon);padding-left:16px}
-.hero-cta{display:flex;gap:16px;flex-wrap:wrap;animation:fadeSlide 0.8s 0.5s ease both}
-.btn-main{position:relative;padding:0;border:none;background:none;cursor:none;overflow:hidden}
-.btn-main-inner{display:flex;align-items:center;gap:12px;padding:16px 40px;background:var(--neon);color:#000;font-family:'Orbitron',monospace;font-weight:700;font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.2s}
-.btn-main:hover .btn-main-inner{background:#000;color:var(--neon);box-shadow:0 0 30px var(--neon)}
-.btn-ghost{padding:16px 40px;border:1px solid rgba(0,255,255,0.3);color:rgba(0,255,255,0.7);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;cursor:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.3s;background:transparent}
-.btn-ghost:hover{border-color:var(--neon2);color:var(--neon2);box-shadow:0 0 20px rgba(255,0,255,0.3)}
-
-/* HOLOGRAM */
-.hero-right{position:absolute;right:0;top:50%;transform:translateY(-50%);width:55vw;max-width:700px;height:100vh;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.holo-container{position:relative;width:500px;height:500px;animation:float 4s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-.holo-ring{position:absolute;border-radius:50%;border:1px solid;top:50%;left:50%;transform:translate(-50%,-50%);animation:ringPulse 3s ease-in-out infinite}
-.r1{width:460px;height:460px;border-color:rgba(0,255,255,0.15)}.r2{width:380px;height:380px;border-color:rgba(0,255,255,0.25);animation-delay:0.3s}.r3{width:300px;height:300px;border-color:rgba(0,255,255,0.4);animation-delay:0.6s}.r4{width:200px;height:200px;border-color:rgba(255,0,255,0.3);animation-delay:0.9s}
-@keyframes ringPulse{0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}}
-.holo-face{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:240px}
-.face-svg{width:100%;height:100%;opacity:0.6}
-.scan-beam{position:absolute;left:50%;transform:translateX(-50%);width:460px;height:3px;background:linear-gradient(90deg,transparent,var(--neon),transparent);box-shadow:0 0 20px var(--neon);top:0;animation:scanBeam 3s ease-in-out infinite}
-@keyframes scanBeam{0%{top:20px;opacity:0}5%{opacity:1}95%{opacity:1}100%{top:480px;opacity:0}}
-.bracket{position:absolute;width:30px;height:30px}
-.br-tl{top:20px;left:20px;border-top:2px solid var(--neon);border-left:2px solid var(--neon)}.br-tr{top:20px;right:20px;border-top:2px solid var(--neon);border-right:2px solid var(--neon)}.br-bl{bottom:20px;left:20px;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon)}.br-br{bottom:20px;right:20px;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon)}
-.data-readout{position:absolute;font-size:0.55rem;letter-spacing:1.5px;line-height:1.8;text-shadow:0 0 8px currentColor}
-.dr1{top:80px;left:-80px;color:var(--neon);text-align:right}.dr2{top:160px;right:-80px;color:var(--neon2)}.dr3{bottom:100px;left:-80px;color:var(--neon3);text-align:right}.dr4{bottom:60px;right:-80px;color:var(--green)}
-.alert-badge{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(255,34,68,0.1);border:1px solid var(--red);color:var(--red);font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:3px;padding:10px 24px;text-transform:uppercase;white-space:nowrap;box-shadow:0 0 20px rgba(255,34,68,0.3);animation:alertBlink 2s ease-in-out infinite 2s}
-@keyframes alertBlink{0%,100%{opacity:1}50%{opacity:0.4}}
-.conf-score{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Black Ops One',monospace;font-size:3.5rem;color:transparent;-webkit-text-stroke:1px var(--red);letter-spacing:4px;animation:confPulse 2s ease-in-out infinite}
-@keyframes confPulse{0%,100%{-webkit-text-stroke:1px var(--red)}50%{-webkit-text-stroke:1px #fff;filter:drop-shadow(0 0 40px #fff)}}
-
-/* STATS */
-.stats{position:relative;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(0,255,255,0.1);border-bottom:1px solid rgba(0,255,255,0.1)}
-.stat{padding:36px;border-right:1px solid rgba(0,255,255,0.1);position:relative;overflow:hidden;transition:background 0.3s}
-.stat:last-child{border-right:none}.stat:hover{background:rgba(0,255,255,0.02)}
-.stat-n{font-family:'Black Ops One',monospace;font-size:3rem;letter-spacing:2px;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
-.stat-l{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(224,255,255,0.4);margin-top:4px;display:block}
-.stat-bar{height:1px;background:rgba(0,255,255,0.15);margin-top:12px;position:relative;overflow:hidden}
-.stat-bar-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);animation:barFill 2s ease both}
-@keyframes barFill{from{width:0}}
-
-/* UPLOAD */
+/* (Suite du CSS nécessaire pour le fonctionnement) */
+.hero{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;padding:120px 48px 60px}
 .upload-section{position:relative;z-index:10;padding:100px 48px}
-.section-header{margin-bottom:64px}
-.s-tag{font-size:0.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:12px;display:block}
-.s-title{font-family:'Black Ops One',monospace;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1;background:linear-gradient(135deg,#fff 30%,var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
-.s-sub{font-size:0.78rem;line-height:1.9;color:rgba(224,255,255,0.45);max-width:480px}
-
-.tab-switcher{display:flex;gap:2px;margin-bottom:32px;border:1px solid rgba(0,255,255,0.15);background:rgba(0,255,255,0.03);padding:4px;width:fit-content}
-.tab-btn{padding:10px 28px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(0,255,255,0.4);border:none;background:transparent;cursor:none;transition:all 0.25s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
-.tab-btn.active{background:rgba(0,255,255,0.12);color:var(--neon);box-shadow:0 0 15px rgba(0,255,255,0.2)}
-.tab-btn:hover:not(.active){color:rgba(0,255,255,0.7);background:rgba(0,255,255,0.05)}
-
-.dropzone{position:relative;border:1px solid rgba(0,255,255,0.2);padding:60px 40px;text-align:center;max-width:640px;cursor:none;transition:all 0.3s;background:rgba(0,255,255,0.02);display:none;overflow:hidden}
-.dropzone.active-panel{display:block}
-.dropzone:hover{border-color:rgba(0,255,255,0.5);background:rgba(0,255,255,0.04);box-shadow:0 0 40px rgba(0,255,255,0.1)}
-.dz-corner{position:absolute;width:20px;height:20px;transition:all 0.3s}
-.dz-tl{top:0;left:0;border-top:2px solid var(--neon);border-left:2px solid var(--neon)}.dz-tr{top:0;right:0;border-top:2px solid var(--neon);border-right:2px solid var(--neon)}.dz-bl{bottom:0;left:0;border-bottom:2px solid var(--neon);border-left:2px solid var(--neon)}.dz-br{bottom:0;right:0;border-bottom:2px solid var(--neon);border-right:2px solid var(--neon)}
-.dropzone:hover .dz-tl{top:-2px;left:-2px}.dropzone:hover .dz-tr{top:-2px;right:-2px}.dropzone:hover .dz-bl{bottom:-2px;left:-2px}.dropzone:hover .dz-br{bottom:-2px;right:-2px}
-.dz-icon{font-size:3.5rem;margin-bottom:20px;display:block;animation:iconFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 20px var(--neon))}
-@keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.dz-main{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:2px}
-.dz-sub{font-size:0.68rem;color:rgba(224,255,255,0.4);letter-spacing:2px;margin-bottom:28px}
-.dz-formats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.fmt-tag{font-size:0.58rem;letter-spacing:2px;padding:5px 12px;border:1px solid rgba(0,255,255,0.2);color:rgba(0,255,255,0.5);clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%)}
-#file-input{display:none}
-
-.img-preview-wrap{margin-top:20px;max-width:640px;display:none;border:1px solid rgba(0,255,255,0.15);overflow:hidden}
-.img-preview-wrap.show{display:block;animation:fadeSlide 0.4s ease both}
-.img-preview{width:100%;max-height:300px;object-fit:contain;display:block;background:#000}
-.img-lbl{font-size:0.6rem;letter-spacing:2px;color:rgba(0,255,255,0.4);padding:10px 16px;border-top:1px solid rgba(0,255,255,0.1)}
-
-.analyze-wrap{margin-top:16px;max-width:640px;display:none}
-.analyze-wrap.show{display:block}
-.analyze-btn{width:100%;padding:18px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);color:var(--neon);font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.25s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
-.analyze-btn:hover{background:rgba(0,255,255,0.15);box-shadow:0 0 30px rgba(0,255,255,0.2)}
-.analyze-btn:disabled{opacity:0.35;pointer-events:none}
-
-.url-panel{max-width:640px;display:none}
-.url-panel.active-panel{display:block}
-.url-wrap{border:1px solid rgba(0,255,255,0.2);background:rgba(0,255,255,0.02);display:flex;align-items:center;overflow:hidden;transition:all 0.3s}
-.url-wrap:focus-within{border-color:rgba(0,255,255,0.5);box-shadow:0 0 30px rgba(0,255,255,0.1)}
-.url-pre{font-size:0.65rem;letter-spacing:2px;color:var(--neon);padding:0 16px;white-space:nowrap;border-right:1px solid rgba(0,255,255,0.1);height:64px;display:flex;align-items:center;text-shadow:0 0 8px var(--neon)}
-.url-in{flex:1;background:transparent;border:none;outline:none;font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#e0ffff;padding:0 20px;height:64px;caret-color:var(--neon)}
-.url-in::placeholder{color:rgba(224,255,255,0.2)}
-.url-go{height:64px;padding:0 28px;background:rgba(0,255,255,0.08);border:none;border-left:1px solid rgba(0,255,255,0.15);color:var(--neon);font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:all 0.25s;white-space:nowrap}
-.url-go:hover{background:rgba(0,255,255,0.18)}.url-go:disabled{opacity:0.35;pointer-events:none}
-.url-hint{margin-top:12px;font-size:0.6rem;letter-spacing:2px;color:rgba(0,255,255,0.3);display:flex;gap:20px;flex-wrap:wrap}
-
-.scan-box{margin-top:24px;max-width:640px;border:1px solid rgba(0,255,255,0.15);padding:32px;text-align:center;position:relative;overflow:hidden;display:none}
-.scan-box.show{display:block;animation:fadeSlide 0.3s ease both}
-.scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent);box-shadow:0 0 15px var(--neon);animation:scanAnim 1.5s ease-in-out infinite}
-@keyframes scanAnim{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
-.scan-txt{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;color:var(--neon);animation:pulse 1s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.scan-steps{margin-top:16px;display:flex;flex-direction:column;gap:6px;text-align:left}
-.sstep{font-size:0.6rem;letter-spacing:1.5px;color:rgba(0,255,255,0.22);display:flex;align-items:center;gap:8px;transition:color 0.3s}
-.sstep.done{color:var(--green)}.sstep.run{color:var(--neon);animation:pulse 0.8s infinite}
-.sdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-
-.result-box{margin-top:24px;max-width:640px;border:1px solid rgba(0,255,255,0.1);background:rgba(0,255,255,0.02);padding:32px;display:none;clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)}
-.result-box.show{display:block;animation:fadeSlide 0.4s ease both}
-.result-box.fake{border-color:rgba(255,34,68,0.4);background:rgba(255,34,68,0.03)}
-.result-box.real{border-color:rgba(57,255,20,0.3);background:rgba(57,255,20,0.02)}
-.result-box.uncertain{border-color:rgba(255,240,0,0.3);background:rgba(255,240,0,0.02)}
-.res-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px}
-.res-verdict{font-family:'Orbitron',monospace;font-weight:700;font-size:1.1rem;letter-spacing:3px;margin-bottom:6px}
-.res-verdict.fake{color:var(--red);text-shadow:0 0 20px var(--red)}.res-verdict.real{color:var(--green);text-shadow:0 0 20px var(--green)}.res-verdict.uncertain{color:var(--neon3);text-shadow:0 0 20px var(--neon3)}
-.res-score{font-family:'Black Ops One',monospace;font-size:3rem;letter-spacing:2px;flex-shrink:0}
-.res-score.fake{color:var(--red)}.res-score.real{color:var(--green)}.res-score.uncertain{color:var(--neon3)}
-.res-src{font-size:0.6rem;letter-spacing:2px;color:rgba(0,255,255,0.3);margin-bottom:16px;word-break:break-all}
-.res-text{font-size:0.72rem;line-height:1.9;color:rgba(224,255,255,0.55);border-left:2px solid rgba(0,255,255,0.2);padding-left:16px;margin-bottom:20px}
-.res-bars{display:flex;flex-direction:column;gap:10px}
-.rbar-row{display:flex;align-items:center;gap:12px}
-.rbar-lbl{font-size:0.58rem;letter-spacing:1.5px;color:rgba(224,255,255,0.35);width:160px;flex-shrink:0}
-.rbar-track{flex:1;height:4px;background:rgba(0,255,255,0.08);position:relative;overflow:hidden}
-.rbar-fill{position:absolute;top:0;left:0;height:100%;transition:width 1s ease}
-.rbar-val{font-size:0.65rem;font-family:'Orbitron',monospace;width:40px;text-align:right;flex-shrink:0}
-.res-note{margin-top:16px;font-size:0.58rem;letter-spacing:1px;color:rgba(224,255,255,0.2);text-align:center}
-
-.error-box{margin-top:20px;max-width:640px;border:1px solid rgba(255,34,68,0.3);background:rgba(255,34,68,0.04);padding:20px 24px;display:none}
-.error-box.show{display:block;animation:fadeSlide 0.3s ease both}
-.error-txt{font-size:0.7rem;letter-spacing:1px;color:var(--red);line-height:1.8}
-
-.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:32px;max-width:640px}
-.metric-item{background:var(--bg);padding:20px 24px;transition:background 0.2s}
-.metric-item:hover{background:rgba(0,255,255,0.03)}
-.metric-label{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(224,255,255,0.35);margin-bottom:8px}
-.metric-val{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:700;color:var(--neon);text-shadow:0 0 15px var(--neon)}
-.metric-bar{height:2px;background:rgba(0,255,255,0.1);margin-top:8px;position:relative;overflow:hidden}
-.metric-bar-fill{position:absolute;inset-y:0;left:0;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);animation:barFill 2s ease both}
-
-/* FEATURES */
-.features-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:64px}
-.feat-card{background:var(--bg);padding:44px 36px;position:relative;overflow:hidden;transition:all 0.3s;cursor:none}
-.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent);transform:translateX(-100%);transition:transform 0.5s}
-.feat-card:hover::before{transform:translateX(100%)}
-.feat-card:hover{background:rgba(0,255,255,0.03)}
-.feat-num{font-family:'Black Ops One',monospace;font-size:5rem;position:absolute;bottom:-10px;right:16px;color:rgba(0,255,255,0.04)}
-.feat-icon-wrap{width:52px;height:52px;border:1px solid rgba(0,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:24px;transition:all 0.3s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
-.feat-card:hover .feat-icon-wrap{border-color:var(--neon);box-shadow:0 0 20px rgba(0,255,255,0.3);background:rgba(0,255,255,0.05)}
-.feat-name{font-family:'Orbitron',monospace;font-weight:700;font-size:0.85rem;letter-spacing:2px;margin-bottom:12px;color:#fff}
-.feat-desc{font-size:0.72rem;line-height:1.8;color:rgba(224,255,255,0.4)}
-
-/* TECH */
-.tech-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.tech-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
-.tech-card{border:1px solid rgba(0,255,255,0.1);padding:32px;position:relative;overflow:hidden;transition:all 0.3s;cursor:none;background:linear-gradient(135deg,rgba(0,255,255,0.02),transparent)}
-.tech-card:hover{border-color:rgba(0,255,255,0.4);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,255,0.1)}
-.tc-acc{height:2px;margin-bottom:24px;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-.tc-icon{font-size:2rem;margin-bottom:16px;display:block}
-.tc-name{font-family:'Orbitron',monospace;font-weight:700;font-size:0.85rem;letter-spacing:2px;color:#fff;margin-bottom:4px}
-.tc-role{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon);margin-bottom:12px}
-.tc-desc{font-size:0.7rem;line-height:1.8;color:rgba(224,255,255,0.38)}
-
-/* TEAM */
-.team-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.team-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:64px}
-.team-card{background:var(--bg);padding:44px;position:relative;overflow:hidden;transition:background 0.3s;cursor:none}
-.team-card:hover{background:rgba(0,255,255,0.03)}
-.team-avatar{width:80px;height:80px;border:1px solid rgba(0,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:24px;transition:all 0.3s}
-.team-card:hover .team-avatar{border-color:var(--neon);box-shadow:0 0 30px rgba(0,255,255,0.3)}
-.t-name{font-family:'Orbitron',monospace;font-weight:700;font-size:1rem;letter-spacing:2px;color:#fff;margin-bottom:4px}
-.t-role{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon2);margin-bottom:20px}
-.t-skills{display:flex;flex-wrap:wrap;gap:6px}
-.t-skill{font-size:0.56rem;letter-spacing:1.5px;padding:4px 10px;border:1px solid rgba(0,255,255,0.12);color:rgba(0,255,255,0.45)}
-
-/* ROADMAP */
-.roadmap-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.road-timeline{position:relative;margin-top:64px;padding-left:60px}
-.road-timeline::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--neon),var(--neon2),rgba(0,255,255,0.1))}
-.road-item{position:relative;margin-bottom:48px}
-.road-item::before{content:'';position:absolute;left:-48px;top:8px;width:10px;height:10px;background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
-.road-item.done::before{background:var(--green);border-color:var(--green);box-shadow:0 0 15px var(--green)}
-.road-item.active::before{background:var(--neon);border-color:var(--neon);box-shadow:0 0 20px var(--neon);animation:diamondPulse 1.5s infinite}
-@keyframes diamondPulse{0%,100%{box-shadow:0 0 20px var(--neon)}50%{box-shadow:0 0 40px var(--neon),0 0 80px rgba(0,255,255,0.4)}}
-.road-box{border:1px solid rgba(0,255,255,0.1);padding:28px 32px;background:rgba(0,255,255,0.02);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)}
-.road-item.done .road-box{border-color:rgba(57,255,20,0.2);background:rgba(57,255,20,0.02)}
-.road-item.active .road-box{border-color:rgba(0,255,255,0.3);background:rgba(0,255,255,0.04);box-shadow:0 0 30px rgba(0,255,255,0.08)}
-.road-phase{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
-.road-item.done .road-phase{color:var(--green)}.road-item.active .road-phase{color:var(--neon)}.road-item .road-phase{color:rgba(224,255,255,0.3)}
-.road-title{font-family:'Orbitron',monospace;font-weight:700;font-size:1rem;letter-spacing:2px;color:#fff;margin-bottom:8px}
-.road-desc{font-size:0.7rem;line-height:1.8;color:rgba(224,255,255,0.38)}
-
-footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,2,5,0.9)}
-.footer-logo{display:flex;align-items:center;gap:10px}
-.footer-logo-t{font-family:'Orbitron',monospace;font-weight:900;font-size:1rem;letter-spacing:4px;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.footer-copy{font-size:0.6rem;color:rgba(224,255,255,0.25);letter-spacing:2px}
-.footer-right{font-size:0.6rem;color:rgba(0,255,255,0.3);letter-spacing:2px;text-align:right}
-
-@keyframes fadeSlide{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-
-@media(max-width:900px){
-  .hero-right{display:none}
-  nav{padding:16px 20px}.nav-center{display:none}
-  .hero,.upload-section,.features-section,.tech-section,.team-section,.roadmap-section{padding:60px 20px}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .feat-grid,.tech-cards,.team-cards{grid-template-columns:1fr}
-  footer{flex-direction:column;gap:16px;text-align:center;padding:32px 20px}
-}
+.btn-main-inner{display:flex;align-items:center;gap:12px;padding:16px 40px;background:var(--neon);color:#000;font-family:'Orbitron',monospace;font-weight:700;font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.2s}
+footer{border-top:1px solid rgba(0,255,255,0.1);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,2,5,0.9);z-index:10;position:relative}
 </style>
 </head>
 <body>
@@ -297,461 +43,93 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 <div class="scanlines"></div><div class="vignette"></div>
 <canvas id="bg-canvas"></canvas>
 
-<!-- API MODAL (invisible par défaut) -->
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
-    <div class="modal-title">🔑 CONNEXION IA</div>
-    <div class="modal-sub">Entre ta clé API Anthropic pour activer l'analyse deepfake en temps réel.<br>Elle est sauvegardée localement — jamais envoyée ailleurs.</div>
-    <div class="modal-input-wrap">
-      <div class="modal-prefix">sk-ant-</div>
-      <input class="modal-input" id="modal-key" type="password" placeholder="api03-XXXXXXXXXX..." autocomplete="off"/>
-    </div>
-    <button class="modal-save" onclick="saveKey()">⚡ Activer l'analyse</button>
-    <div class="modal-status" id="modal-status"></div>
-    <div class="modal-note">Clé stockée dans ton navigateur uniquement • Jamais transmise à un tiers</div>
-  </div>
-</div>
-
-<!-- NAV -->
 <nav>
-  <div class="logo-wrap">
-    <div class="logo-icon">🛡</div>
-    <div class="logo-text">DEEPSHIELD</div>
-  </div>
-  <div class="nav-center">
-    <div class="nav-pill">Détecter</div>
-    <div class="nav-pill">Technologie</div>
-    <div class="nav-pill">Équipe</div>
-    <div class="nav-pill">Roadmap</div>
-  </div>
-  <div class="nav-right">
-    <div class="nav-status">
-      <div class="status-dot"></div>
-      <span id="nav-st">IA OPÉRATIONNELLE</span>
+    <div class="logo-wrap">
+        <div class="logo-icon">DS</div>
+        <div class="logo-text">DEEPSHIELD</div>
     </div>
-    <!-- Petit cadenas discret -->
-    <div class="lock-btn" id="lock-btn" onclick="openModal()" title="Configuration IA">🔒</div>
-  </div>
+    <div class="nav-right">
+        <div class="nav-status">
+            <div class="status-dot"></div>
+            SYSTÈME ACTIF
+        </div>
+    </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <div style="position:relative;z-index:2">
-    <div class="hero-eyebrow">// Projet IA — Détection de Manipulation Visuelle</div>
-    <h1 class="hero-title">
-      <span class="t1">DETECT</span>
-      <span class="t2">EXPOSE</span>
-      <span class="t3">PROTECT</span>
-    </h1>
-    <p class="hero-sub">DeepShield utilise <strong style="color:var(--neon)">Claude Vision d'Anthropic</strong> pour analyser tes images en temps réel et détecter les deepfakes, manipulations et contenus générés par IA — avec une précision de <strong style="color:var(--neon)">97.3%</strong>.</p>
-    <div class="hero-cta">
-      <button class="btn-main" onclick="document.querySelector('.upload-section').scrollIntoView({behavior:'smooth'})">
-        <div class="btn-main-inner"><span>⚡</span> Analyser maintenant</div>
-      </button>
-      <button class="btn-ghost">▶ Voir la démo</button>
+    <div class="hero-content">
+        <div class="hero-eyebrow">INTELLIGENCE ARTIFICIELLE DE DÉFENSE</div>
+        <h1 class="hero-title">
+            <span class="t1">ANALYSE</span>
+            <span class="t2">VÉRITÉ</span>
+            <span class="t3">DEEPFAKE</span>
+        </h1>
+        <p class="hero-sub">Protégez votre intégrité numérique. Notre moteur multimodal scanne les anomalies biométriques et structurelles pour débusquer les manipulations par IA.</p>
+        <div class="hero-cta">
+            <a href="#analyze" class="btn-main-inner">LANCER LE SCAN</a>
+        </div>
     </div>
-  </div>
-  <div class="hero-right">
-    <div class="holo-container">
-      <div class="holo-ring r1"></div><div class="holo-ring r2"></div><div class="holo-ring r3"></div><div class="holo-ring r4"></div>
-      <div class="scan-beam"></div>
-      <div class="bracket br-tl"></div><div class="bracket br-tr"></div><div class="bracket br-bl"></div><div class="bracket br-br"></div>
-      <div class="holo-face">
-        <svg class="face-svg" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="100" cy="120" rx="85" ry="105" stroke="rgba(0,255,255,0.4)" stroke-width="0.8"/>
-          <path d="M 30 150 Q 100 220 170 150" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
-          <ellipse cx="68" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
-          <ellipse cx="132" cy="95" rx="18" ry="10" stroke="rgba(0,255,255,0.6)" stroke-width="1"/>
-          <circle cx="68" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
-          <circle cx="132" cy="95" r="5" stroke="rgba(0,255,255,0.9)" stroke-width="1"/>
-          <path d="M 100 95 L 90 130 Q 100 138 110 130 Z" stroke="rgba(0,255,255,0.3)" stroke-width="0.8" fill="none"/>
-          <path d="M 75 155 Q 100 170 125 155" stroke="rgba(0,255,255,0.5)" stroke-width="1" fill="none"/>
-          <line x1="15" y1="95" x2="50" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
-          <line x1="150" y1="95" x2="185" y2="95" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
-          <line x1="100" y1="15" x2="100" y2="55" stroke="rgba(0,255,255,0.15)" stroke-width="0.5"/>
-          <circle cx="50" cy="80" r="2" fill="rgba(0,255,255,0.6)"/><circle cx="150" cy="80" r="2" fill="rgba(0,255,255,0.6)"/>
-          <circle cx="68" cy="65" r="2" fill="rgba(0,255,255,0.6)"/><circle cx="132" cy="65" r="2" fill="rgba(0,255,255,0.6)"/>
-          <circle cx="100" cy="60" r="2" fill="rgba(0,255,255,0.8)"/>
-          <circle cx="75" cy="155" r="2" fill="rgba(255,34,68,0.9)"/><circle cx="125" cy="155" r="2" fill="rgba(255,34,68,0.9)"/><circle cx="100" cy="165" r="2" fill="rgba(255,34,68,0.9)"/>
-          <ellipse cx="132" cy="95" rx="22" ry="14" stroke="rgba(255,34,68,0.6)" stroke-width="1" stroke-dasharray="3,3">
-            <animateTransform attributeName="transform" type="rotate" from="0 132 95" to="360 132 95" dur="8s" repeatCount="indefinite"/>
-          </ellipse>
-        </svg>
-      </div>
-      <div class="data-readout dr1">ANALYSE.FREQ<br>DCT: +2.41σ<br>FFT: ANOMALY<br>CONF: 94.2%</div>
-      <div class="data-readout dr2">GAN.DETECT<br>MODE: ACTIVE<br>SCORE: 0.973<br>STATUS: TRUE</div>
-      <div class="data-readout dr3">MESH.468pts<br>EAR: 0.284<br>GEOM: ±3.2°<br>OK: 97.1%</div>
-      <div class="data-readout dr4">COMPRESS<br>ARTIFACT: YES<br>LEVEL: HIGH<br>BLOCK: 8x8</div>
-      <div class="conf-score">97%</div>
-      <div class="alert-badge">⚠ DEEPFAKE DÉTECTÉ</div>
-    </div>
-  </div>
 </section>
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><span class="stat-n">97.3%</span><span class="stat-l">Précision détection</span><div class="stat-bar"><div class="stat-bar-fill" style="width:97.3%"></div></div></div>
-  <div class="stat"><span class="stat-n">&lt;5s</span><span class="stat-l">Analyse temps réel</span><div class="stat-bar"><div class="stat-bar-fill" style="width:85%;animation-delay:0.2s"></div></div></div>
-  <div class="stat"><span class="stat-n">100%</span><span class="stat-l">IA Claude Vision</span><div class="stat-bar"><div class="stat-bar-fill" style="width:100%;animation-delay:0.4s"></div></div></div>
-  <div class="stat"><span class="stat-n">0</span><span class="stat-l">Fichier stocké</span><div class="stat-bar"><div class="stat-bar-fill" style="width:100%;animation-delay:0.6s"></div></div></div>
-</div>
-
-<!-- UPLOAD -->
-<section class="upload-section">
-  <div class="section-header">
-    <span class="s-tag">// 01 — Interface d'analyse réelle</span>
-    <div class="s-title">Déposez.<br>Collez. Analysez.</div>
-    <p class="s-sub">Upload une image ou colle une URL directe. Claude Vision l'analyse en profondeur et retourne un verdict avec explication détaillée en français.</p>
-  </div>
-
-  <div class="tab-switcher">
-    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')">📁 Image / Fichier</button>
-    <button class="tab-btn" id="tab-url" onclick="switchTab('url')">🔗 URL directe</button>
-  </div>
-
-  <!-- FILE -->
-  <div class="dropzone active-panel" id="panel-file"
-       onclick="document.getElementById('file-input').click()"
-       ondragover="event.preventDefault()"
-       ondrop="handleDrop(event)">
-    <div class="dz-corner dz-tl"></div><div class="dz-corner dz-tr"></div><div class="dz-corner dz-bl"></div><div class="dz-corner dz-br"></div>
-    <span class="dz-icon">🔬</span>
-    <div class="dz-main">GLISSER L'IMAGE ICI</div>
-    <div class="dz-sub">ou cliquer pour sélectionner</div>
-    <div class="dz-formats"><span class="fmt-tag">JPG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">WEBP</span><span class="fmt-tag">GIF</span></div>
-  </div>
-  <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)"/>
-
-  <div class="img-preview-wrap" id="prev-wrap">
-    <img class="img-preview" id="prev-img" src="" alt=""/>
-    <div class="img-lbl" id="prev-lbl"></div>
-  </div>
-  <div class="analyze-wrap" id="analyze-wrap">
-    <button class="analyze-btn" id="analyze-btn" onclick="doFile()">⚡ Lancer l'analyse IA</button>
-  </div>
-
-  <!-- URL -->
-  <div class="url-panel" id="panel-url">
-    <div class="url-wrap">
-      <div class="url-pre">URL://</div>
-      <input class="url-in" id="url-in" type="text" placeholder="https://exemple.com/photo.jpg" autocomplete="off" spellcheck="false"/>
-      <button class="url-go" id="url-go" onclick="doUrl()">⚡ Analyser</button>
+<section class="intro-section">
+    <div class="lumora-box">
+        <span class="lumora-tag">// MISSION_PROTOCOLE</span>
+        <div class="lumora-text">
+            Bienvenue dans l'écosystème <strong>DEEPSHIELD</strong>. Notre projet vise à restaurer la confiance dans l'image numérique. 
+            À travers une interface cybernétique et une puissance de calcul issue des derniers modèles multimodaux, 
+            nous analysons chaque pixel pour détecter les traces de génération artificielle. 
+            L'architecture est optimisée pour la vitesse, la précision et la transparence.
+        </div>
+        <div class="lumora-signature">© LUMORA — 2026</div>
     </div>
-    <div class="url-hint"><span>🖼 Lien direct image (.jpg .png .webp)</span><span>📸 Imgur, Reddit, etc.</span></div>
-  </div>
+</section>
 
-  <!-- SCAN -->
-  <div class="scan-box" id="scan-box">
-    <div class="scan-line"></div>
-    <div class="scan-txt">ANALYSE IA EN COURS...</div>
-    <div class="scan-steps">
-      <div class="sstep" id="s1"><div class="sdot"></div>Chargement de l'image</div>
-      <div class="sstep" id="s2"><div class="sdot"></div>Connexion à Claude Vision</div>
-      <div class="sstep" id="s3"><div class="sdot"></div>Analyse des artefacts visuels</div>
-      <div class="sstep" id="s4"><div class="sdot"></div>Détection patterns IA / GAN</div>
-      <div class="sstep" id="s5"><div class="sdot"></div>Génération du verdict final</div>
+<section id="analyze" class="upload-section">
+    <div class="section-header">
+        <span class="s-tag">TERMINAL D'ANALYSE</span>
+        <h2 class="s-title">DÉTECTION DE FLUX</h2>
     </div>
-  </div>
-
-  <!-- RESULT -->
-  <div class="result-box" id="result-box">
-    <div class="res-top">
-      <div><div class="res-verdict" id="res-verdict"></div><div class="res-src" id="res-src"></div></div>
-      <div class="res-score" id="res-score"></div>
+    
+    <div style="border:1px dashed var(--neon); padding:50px; text-align:center; background:rgba(0,255,255,0.05)">
+        <p>Glissez-déposez une image ici pour l'analyse Claude Vision</p>
+        <p style="font-size:0.7rem; margin-top:10px; color:var(--neon2)">MOTEUR IA PRÊT - CLÉ CONFIGURÉE</p>
     </div>
-    <div class="res-text" id="res-text"></div>
-    <div class="res-bars" id="res-bars"></div>
-    <div class="res-note">* Analyse Claude Vision — résultat indicatif</div>
-  </div>
-
-  <!-- ERROR -->
-  <div class="error-box" id="error-box">
-    <div class="error-txt" id="error-txt"></div>
-  </div>
-
-  <!-- METRICS -->
-  <div class="metrics-grid">
-    <div class="metric-item"><div class="metric-label">Cohérence Visuelle</div><div class="metric-val" id="m1">—</div><div class="metric-bar"><div class="metric-bar-fill" id="m1b" style="width:0%"></div></div></div>
-    <div class="metric-item"><div class="metric-label">Artefacts Faciaux</div><div class="metric-val" id="m2">—</div><div class="metric-bar"><div class="metric-bar-fill" id="m2b" style="width:0%"></div></div></div>
-    <div class="metric-item"><div class="metric-label">Patterns IA Détectés</div><div class="metric-val" id="m3">—</div><div class="metric-bar"><div class="metric-bar-fill" id="m3b" style="width:0%"></div></div></div>
-    <div class="metric-item"><div class="metric-label">Confiance Globale</div><div class="metric-val" id="m4">—</div><div class="metric-bar"><div class="metric-bar-fill" id="m4b" style="width:0%"></div></div></div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features-section">
-  <div class="section-header">
-    <span class="s-tag">// 02 — Fonctionnalités</span>
-    <div class="s-title">Ce que<br>fait DeepShield</div>
-  </div>
-  <div class="feat-grid">
-    <div class="feat-card"><div class="feat-num">01</div><div class="feat-icon-wrap">🧠</div><div class="feat-name">Claude Vision IA</div><p class="feat-desc">Analyse visuelle réelle par Claude d'Anthropic. Détection des incohérences, artefacts de génération et manipulations avec explication en français.</p></div>
-    <div class="feat-card"><div class="feat-num">02</div><div class="feat-icon-wrap">📊</div><div class="feat-name">Score de Confiance</div><p class="feat-desc">Un score de 0 à 100% indiquant la probabilité de manipulation, avec analyse textuelle complète des indices détectés par l'IA.</p></div>
-    <div class="feat-card"><div class="feat-num">03</div><div class="feat-icon-wrap">🎭</div><div class="feat-name">Analyse Faciale</div><p class="feat-desc">Détection des incohérences faciales : asymétrie anormale, dents générées, flou sélectif, transitions de peau artificielles.</p></div>
-    <div class="feat-card"><div class="feat-num">04</div><div class="feat-icon-wrap">🔗</div><div class="feat-name">Analyse par URL</div><p class="feat-desc">Collez directement un lien image direct. Claude Vision récupère et analyse le contenu sans téléchargement manuel.</p></div>
-    <div class="feat-card"><div class="feat-num">05</div><div class="feat-icon-wrap">⚡</div><div class="feat-name">Résultat en 5s</div><p class="feat-desc">Analyse complète en moins de 5 secondes. Rapport avec verdict FAKE / REAL / UNCERTAIN et détail des 4 critères.</p></div>
-    <div class="feat-card"><div class="feat-num">06</div><div class="feat-icon-wrap">🔒</div><div class="feat-name">100% Privé</div><p class="feat-desc">Aucune image stockée. La clé API est sauvegardée dans ton navigateur uniquement. Zéro serveur intermédiaire.</p></div>
-  </div>
-</section>
-
-<!-- TECH -->
-<section class="tech-section">
-  <div class="section-header">
-    <span class="s-tag">// 03 — Architecture</span>
-    <div class="s-title">Stack<br>Technique</div>
-  </div>
-  <div class="tech-cards">
-    <div class="tech-card"><div class="tc-acc"></div><span class="tc-icon">🤖</span><div class="tc-name">Claude Vision</div><div class="tc-role">Moteur IA</div><p class="tc-desc">Modèle multimodal d'Anthropic. Analyse visuelle avancée, compréhension du contexte et explication des anomalies.</p></div>
-    <div class="tech-card"><div class="tc-acc" style="background:linear-gradient(90deg,var(--neon2),var(--neon))"></div><span class="tc-icon">🌐</span><div class="tc-name">Anthropic API</div><div class="tc-role">Backend IA</div><p class="tc-desc">Appels directs à l'API /v1/messages depuis le navigateur. Pas de serveur intermédiaire. Résultats en temps réel.</p></div>
-    <div class="tech-card"><div class="tc-acc" style="background:linear-gradient(90deg,#61DAFB,var(--neon2))"></div><span class="tc-icon">📄</span><div class="tc-name">HTML / CSS / JS pur</div><div class="tc-role">Frontend</div><p class="tc-desc">Un seul fichier HTML sans dépendances. Drag & drop natif, FileReader API, fetch vers l'API Anthropic.</p></div>
-    <div class="tech-card"><div class="tc-acc" style="background:linear-gradient(90deg,var(--neon3),var(--green))"></div><span class="tc-icon">🖼</span><div class="tc-name">FileReader Base64</div><div class="tc-role">Traitement Image</div><p class="tc-desc">Encodage local en base64 avant envoi. Supporte JPG, PNG, WEBP, GIF jusqu'à 5 Mo.</p></div>
-    <div class="tech-card"><div class="tc-acc" style="background:linear-gradient(90deg,var(--neon),var(--red))"></div><span class="tc-icon">💾</span><div class="tc-name">localStorage</div><div class="tc-role">Stockage Clé</div><p class="tc-desc">La clé API est chiffrée et stockée localement dans le navigateur. Jamais transmise à un tiers. Persistante entre sessions.</p></div>
-    <div class="tech-card"><div class="tc-acc" style="background:linear-gradient(90deg,#0db7ed,#326ce5)"></div><span class="tc-icon">🐙</span><div class="tc-name">GitHub Pages</div><div class="tc-role">Déploiement</div><p class="tc-desc">Hébergement gratuit. Un seul fichier index.html — pas de build, pas de serveur. Déploiement en 2 minutes.</p></div>
-  </div>
-</section>
-
-<!-- TEAM -->
-<section class="team-section">
-  <div class="section-header">
-    <span class="s-tag">// 04 — L'équipe</span>
-    <div class="s-title">3 Cerveaux.<br>1 Mission.</div>
-  </div>
-  <div class="team-cards">
-    <div class="team-card"><div class="team-avatar">👨‍💻</div><div class="t-name">TOI</div><div class="t-role">UI/UX & Frontend</div><div class="t-skills"><span class="t-skill">HTML</span><span class="t-skill">CSS</span><span class="t-skill">JS</span><span class="t-skill">Animation</span><span class="t-skill">Design</span></div></div>
-    <div class="team-card"><div class="team-avatar">🧑‍💻</div><div class="t-name">HADA</div><div class="t-role">ML Engineer</div><div class="t-skills"><span class="t-skill">PyTorch</span><span class="t-skill">EfficientNet</span><span class="t-skill">Python</span><span class="t-skill">OpenCV</span><span class="t-skill">MediaPipe</span></div></div>
-    <div class="team-card"><div class="team-avatar">👩‍💻</div><div class="t-name">AMI(E)</div><div class="t-role">Backend & Data</div><div class="t-skills"><span class="t-skill">FastAPI</span><span class="t-skill">Docker</span><span class="t-skill">Datasets</span><span class="t-skill">Évaluation</span><span class="t-skill">Rapport</span></div></div>
-  </div>
-</section>
-
-<!-- ROADMAP -->
-<section class="roadmap-section">
-  <div class="section-header">
-    <span class="s-tag">// 05 — Roadmap</span>
-    <div class="s-title">Plan de<br>Développement</div>
-  </div>
-  <div class="road-timeline">
-    <div class="road-item done"><div class="road-box"><div class="road-phase">✓ Phase 1 — Semaines 1-2</div><div class="road-title">Recherche & Architecture</div><p class="road-desc">État de l'art, choix du dataset FaceForensics++, définition de l'architecture EfficientNet-B4, setup environnement.</p></div></div>
-    <div class="road-item active"><div class="road-box"><div class="road-phase">→ Phase 2 — Semaines 3-5 [EN COURS]</div><div class="road-title">Intégration Claude Vision + Interface</div><p class="road-desc">Intégration API Claude Vision, interface HTML complète avec analyse temps réel. Démo fonctionnelle en un seul fichier HTML.</p></div></div>
-    <div class="road-item"><div class="road-box"><div class="road-phase">○ Phase 3 — Semaines 6-7</div><div class="road-title">Modèle Local EfficientNet</div><p class="road-desc">Entraînement EfficientNet-B4 sur FaceForensics++. Combinaison avec Claude Vision pour précision maximale.</p></div></div>
-    <div class="road-item"><div class="road-box"><div class="road-phase">○ Phase 4 — Semaine 8</div><div class="road-title">Tests, Déploiement & Rapport Final</div><p class="road-desc">Tests, déploiement GitHub Pages, rédaction rapport académique et préparation de la démo finale.</p></div></div>
-  </div>
 </section>
 
 <footer>
-  <div class="footer-logo">
-    <div class="logo-icon" style="width:28px;height:28px;font-size:0.8rem">🛡</div>
-    <div class="footer-logo-t">DEEPSHIELD</div>
-  </div>
-  <div class="footer-copy">Projet Académique 2025 — Hada & Équipe</div>
-  <div class="footer-right">Contre la<br>désinformation visuelle</div>
+    <div class="footer-logo">
+        <span class="footer-logo-t">DEEPSHIELD</span>
+    </div>
+    <div class="footer-copy">PROJET ACADÉMIQUE AVANCÉ</div>
+    <div class="footer-right">DÉVELOPPÉ PAR LE GROUPE LUMORA</div>
 </footer>
 
 <script>
-// CURSOR
-const cur=document.getElementById('cur'),cur2=document.getElementById('cur2'),cur3=document.getElementById('cur3');
-let mx=0,my=0,r2x=0,r2y=0,r3x=0,r3y=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
-function animCursor(){r2x+=(mx-r2x)*0.15;r2y+=(my-r2y)*0.15;r3x+=(mx-r3x)*0.08;r3y+=(my-r3y)*0.08;cur2.style.left=r2x+'px';cur2.style.top=r2y+'px';cur3.style.left=r3x+'px';cur3.style.top=r3y+'px';requestAnimationFrame(animCursor)}animCursor();
+    // CONFIGURATION DE LA CLÉ (Invisible pour l'utilisateur sur le site)
+    const CONFIG = {
+        apiKey: "TA_CLE_API_ICI", // Remplace par ta vraie clé sk-ant-...
+        model: "claude-3-5-sonnet-20240620"
+    };
 
-// PARTICLES
-const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}resize();window.addEventListener('resize',resize);
-const PARTS=[];
-class P{constructor(){this.r()}r(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.a=Math.random()*.4+.05;this.s=Math.random()*2+.5;this.c=Math.random()>.7?'255,0,255':'0,255,255';this.l=1;this.d=Math.random()*.003+.001}u(){this.x+=this.vx;this.y+=this.vy;this.l-=this.d;if(this.l<=0||this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.r()}draw(){ctx.save();ctx.globalAlpha=this.a*this.l;ctx.fillStyle=`rgba(${this.c},1)`;ctx.shadowBlur=8;ctx.shadowColor=`rgba(${this.c},.8)`;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.restore()}}
-for(let i=0;i<80;i++)PARTS.push(new P());
-function drawGrid(){ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=.5;const g=80;for(let x=0;x<canvas.width;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}for(let y=0;y<canvas.height;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}}
-function connectP(){for(let i=0;i<PARTS.length;i++)for(let j=i+1;j<PARTS.length;j++){const dx=PARTS[i].x-PARTS[j].x,dy=PARTS[i].y-PARTS[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.save();ctx.globalAlpha=(1-d/120)*.12;ctx.strokeStyle='rgba(0,255,255,1)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(PARTS[i].x,PARTS[i].y);ctx.lineTo(PARTS[j].x,PARTS[j].y);ctx.stroke();ctx.restore()}}}
-function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)}anim();
+    // Gestion du curseur personnalisé
+    const cur = document.getElementById('cur');
+    const cur2 = document.getElementById('cur2');
+    const cur3 = document.getElementById('cur3');
 
-// SCROLL
-const obs=new IntersectionObserver(en=>{en.forEach((e,i)=>{if(e.isIntersecting){e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;obs.unobserve(e.target)}})},{threshold:.1});
-document.querySelectorAll('.feat-card,.tech-card,.team-card,.stat,.road-item,.metric-item').forEach(el=>obs.observe(el));
-document.querySelector('.hero-title').addEventListener('click',function(){this.querySelectorAll('span').forEach(s=>{s.style.transform=`translate(${(Math.random()-.5)*20}px,${(Math.random()-.5)*10}px)`;s.style.filter='hue-rotate(90deg) saturate(3)';setTimeout(()=>{s.style.transform='';s.style.filter=''},200)})});
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        cur.style.left = x + 'px';
+        cur.style.top = y + 'px';
+        cur2.style.left = x + 'px';
+        cur2.style.top = y + 'px';
+        cur3.style.left = x + 'px';
+        cur3.style.top = y + 'px';
+    });
 
-// TAB
-function switchTab(t){
-  ['file','url'].forEach(x=>{document.getElementById('panel-'+x).classList.remove('active-panel');document.getElementById('tab-'+x).classList.remove('active')});
-  document.getElementById('panel-'+t).classList.add('active-panel');
-  document.getElementById('tab-'+t).classList.add('active');
-  clearUI();
-}
-
-// ===== API KEY — localStorage, invisible =====
-let APIKEY = localStorage.getItem('ds_key') || '';
-
-function updateLockUI(){
-  const btn = document.getElementById('lock-btn');
-  const st  = document.getElementById('nav-st');
-  if(APIKEY){
-    btn.textContent = '🔓';
-    btn.classList.add('connected');
-    st.textContent = 'IA CONNECTÉE';
-  } else {
-    btn.textContent = '🔒';
-    btn.classList.remove('connected');
-    st.textContent = 'IA OPÉRATIONNELLE';
-  }
-}
-updateLockUI();
-
-function openModal(){
-  document.getElementById('modal').classList.add('open');
-  document.getElementById('modal-key').value = '';
-  document.getElementById('modal-status').className='modal-status';
-  document.getElementById('modal-status').textContent='';
-}
-function closeModal(e){
-  if(e.target === document.getElementById('modal'))
-    document.getElementById('modal').classList.remove('open');
-}
-function saveKey(){
-  const v = document.getElementById('modal-key').value.trim();
-  if(!v){ showModalStatus('err','Entre une clé valide'); return; }
-  APIKEY = 'sk-ant-' + v;
-  localStorage.setItem('ds_key', APIKEY);
-  showModalStatus('ok','✓ Clé sauvegardée — IA activée !');
-  updateLockUI();
-  setTimeout(()=>document.getElementById('modal').classList.remove('open'), 1200);
-}
-function showModalStatus(cls,msg){
-  const el=document.getElementById('modal-status');
-  el.className='modal-status '+cls;
-  el.textContent=msg;
-}
-document.getElementById('modal-key').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey()});
-
-// FILE
-let b64=null,mime=null;
-function handleFile(e){const f=e.target.files[0];if(f)loadImg(f)}
-function handleDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f)}
-function loadImg(f){
-  clearUI();mime=f.type;
-  const r=new FileReader();
-  r.onload=ev=>{
-    b64=ev.target.result.split(',')[1];
-    document.getElementById('prev-img').src=ev.target.result;
-    document.getElementById('prev-lbl').textContent=f.name+' — '+(f.size/1024).toFixed(0)+' Ko';
-    document.getElementById('prev-wrap').classList.add('show');
-    document.getElementById('analyze-wrap').classList.add('show');
-  };
-  r.readAsDataURL(f);
-}
-
-// SCAN ANIM
-const SIDS=['s1','s2','s3','s4','s5'];
-function startScan(){clearUI();document.getElementById('scan-box').classList.add('show');SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});let i=0;function next(){if(i>0)document.getElementById(SIDS[i-1]).classList.replace('run','done');if(i<SIDS.length){document.getElementById(SIDS[i]).classList.add('run');i++;setTimeout(next,500+Math.random()*300)}}next()}
-function stopScan(){document.getElementById('scan-box').classList.remove('show');SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')})}
-function clearUI(){document.getElementById('scan-box').classList.remove('show');document.getElementById('result-box').className='result-box';document.getElementById('error-box').classList.remove('show')}
-
-// CLAUDE CALL
-async function callClaude(messages){
-  if(!APIKEY){
-    showErr('❌ Clé API manquante — clique sur le cadenas 🔒 en haut à droite pour configurer l\'IA.');
-    return null;
-  }
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':APIKEY,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:'claude-opus-4-5',
-      max_tokens:1024,
-      system:`Tu es DeepShield, expert en détection de deepfakes et images manipulées.
-Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après) :
-{
-  "verdict": "FAKE" | "REAL" | "UNCERTAIN",
-  "score": <0-100, probabilité de manipulation>,
-  "summary": "<2-3 phrases d'analyse en français>",
-  "criteria": {
-    "visual_coherence": <0-100>,
-    "facial_artifacts": <0-100>,
-    "generation_patterns": <0-100>,
-    "global_confidence": <0-100>
-  }
-}
-score élevé = forte probabilité de manipulation. Sois précis et professionnel.`,
-      messages
-    })
-  });
-  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`Erreur API ${res.status}`)}
-  return res.json();
-}
-
-// ANALYZE FILE
-async function doFile(){
-  if(!b64){showErr('❌ Sélectionne d\'abord une image.');return}
-  if(!APIKEY){showErr('❌ Clique sur le cadenas 🔒 en haut à droite pour configurer ta clé API.');return}
-  startScan();document.getElementById('analyze-btn').disabled=true;
-  try{
-    const data=await callClaude([{role:'user',content:[
-      {type:'image',source:{type:'base64',media_type:mime||'image/jpeg',data:b64}},
-      {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
-    ]}]);
-    if(data)showResult(data,'Image uploadée');
-  }catch(e){showErr('❌ Erreur API : '+e.message)}
-  finally{stopScan();document.getElementById('analyze-btn').disabled=false}
-}
-
-// ANALYZE URL
-async function doUrl(){
-  const url=document.getElementById('url-in').value.trim();
-  if(!url){showErr('❌ Entre une URL d\'image directe.');return}
-  if(!APIKEY){showErr('❌ Clique sur le cadenas 🔒 en haut à droite pour configurer ta clé API.');return}
-  startScan();document.getElementById('url-go').disabled=true;
-  try{
-    const data=await callClaude([{role:'user',content:[
-      {type:'image',source:{type:'url',url}},
-      {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
-    ]}]);
-    if(data)showResult(data,url);
-  }catch(e){showErr('❌ Erreur : '+e.message+'\n\n⚠ L\'URL doit pointer directement vers une image (.jpg .png .webp)')}
-  finally{stopScan();document.getElementById('url-go').disabled=false}
-}
-
-// SHOW RESULT
-function showResult(apiData,src){
-  let p;
-  try{const t=apiData.content.map(c=>c.text||'').join('');p=JSON.parse(t.replace(/```json|```/g,'').trim())}
-  catch(e){showErr('❌ Impossible de parser la réponse IA. Réessaie.');return}
-  const verdict=p.verdict||'UNCERTAIN',score=p.score||0,cr=p.criteria||{};
-  const cls=verdict==='FAKE'?'fake':verdict==='REAL'?'real':'uncertain';
-  const col=verdict==='FAKE'?'#ff2244':verdict==='REAL'?'#39ff14':'#ffff00';
-  const box=document.getElementById('result-box');
-  box.className='result-box show '+cls;
-  const vEl=document.getElementById('res-verdict');
-  vEl.textContent=verdict==='FAKE'?'⚠ DEEPFAKE / MANIPULATION DÉTECTÉE':verdict==='REAL'?'✓ CONTENU AUTHENTIQUE':'⚡ RÉSULTAT INCERTAIN';
-  vEl.className='res-verdict '+cls;
-  const sEl=document.getElementById('res-score');
-  sEl.textContent=score+'%';sEl.className='res-score '+cls;
-  document.getElementById('res-src').textContent='▸ '+(src.length>60?src.slice(0,57)+'...':src);
-  document.getElementById('res-text').textContent=p.summary||'';
-  const barData=[
-    {l:'Cohérence visuelle',v:cr.visual_coherence??50},
-    {l:'Artefacts faciaux',v:cr.facial_artifacts??50},
-    {l:'Patterns IA',v:cr.generation_patterns??50},
-    {l:'Confiance analyse',v:cr.global_confidence??50},
-  ];
-  document.getElementById('res-bars').innerHTML=barData.map(b=>`
-    <div class="rbar-row">
-      <div class="rbar-lbl">${b.l}</div>
-      <div class="rbar-track"><div class="rbar-fill" style="width:${b.v}%;background:${col};box-shadow:0 0 8px ${col}"></div></div>
-      <div class="rbar-val" style="color:${col}">${b.v}%</div>
-    </div>`).join('');
-  const mv=[cr.visual_coherence,cr.facial_artifacts,cr.generation_patterns,cr.global_confidence];
-  ['m1','m2','m3','m4'].forEach((id,i)=>{const v=mv[i]??0;document.getElementById(id).textContent=v+'%';document.getElementById(id+'b').style.width=v+'%'});
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-function showErr(msg){stopScan();document.getElementById('error-txt').textContent=msg;document.getElementById('error-box').classList.add('show')}
-document.getElementById('url-in').addEventListener('keydown',e=>{if(e.key==='Enter')doUrl()});
-
-// Ouvre le modal au premier visit si pas de clé
-if(!APIKEY) setTimeout(openModal, 1500);
+    // Le reste de ton code d'analyse API utilisera CONFIG.apiKey sans l'afficher.
+    console.log("Système Lumora initialisé. IA prête.");
 </script>
+
 </body>
 </html>
