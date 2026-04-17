@@ -488,7 +488,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 
 <script>
 // ===== MOT DE PASSE — change la valeur ci-dessous =====
-const PASSWORD = 'yahya'; // ← CHANGE ÇA
+const PASSWORD = 'deepshield2026'; // ← CHANGE ÇA
 
 function checkPassword(){
   const val = document.getElementById('gate-input').value;
@@ -546,10 +546,9 @@ function drawGrid(){ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=.5;con
 function connectP(){for(let i=0;i<PARTS.length;i++)for(let j=i+1;j<PARTS.length;j++){const dx=PARTS[i].x-PARTS[j].x,dy=PARTS[i].y-PARTS[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.save();ctx.globalAlpha=(1-d/120)*.12;ctx.strokeStyle='rgba(0,255,255,1)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(PARTS[i].x,PARTS[i].y);ctx.lineTo(PARTS[j].x,PARTS[j].y);ctx.stroke();ctx.restore()}}}
 function anim(){ctx.clearRect(0,0,W,H);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)}anim();
 
-// ===== CLÉ API — remplace la valeur ci-dessous par ta clé Anthropic =====
-// ⚠ Ne partage JAMAIS ce fichier avec ta clé dedans publiquement
-// Conseil : fixe un budget mensuel sur console.anthropic.com pour limiter les coûts
-const APIKEY = 'anthropic/claude-opus-4.6';
+// ===== URL DU PROXY VERCEL — remplace par ton URL après déploiement =====
+// Format : https://TON-PROJET.vercel.app/api/analyze
+const PROXY_URL = 'https://ai-gateway.vercel.sh/v1';
 
 // TAB
 function switchTab(t){
@@ -624,26 +623,7 @@ function clearUI(){
 // Debounce pour éviter le spam
 let analyzing=false;
 
-// ===== FIX #1 : bon nom de modèle =====
-const MODEL='claude-opus-4-5-20251101';
-
-async function callClaude(messages){
-  if(!APIKEY){
-    showErr('❌ Clé API non configurée — ajoute ta clé dans le code source.');
-    return null;
-  }
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':APIKEY,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model: MODEL,
-      max_tokens:1024,
-      system:`Tu es DeepShield, expert en détection de deepfakes et images manipulées.
+const SYSTEM_PROMPT = `Tu es DeepShield, expert en détection de deepfakes et images manipulées.
 Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après, aucun bloc markdown) :
 {
   "verdict": "FAKE" | "REAL" | "UNCERTAIN",
@@ -656,19 +636,21 @@ Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après,
     "global_confidence": <0-100>
   }
 }
-score élevé = forte probabilité de manipulation. Sois précis et professionnel. Réponds SEULEMENT avec le JSON, sans aucun texte supplémentaire.`,
-      messages
-    })
+score élevé = forte probabilité de manipulation. Sois précis et professionnel. Réponds SEULEMENT avec le JSON, sans aucun texte supplémentaire.`;
+
+async function callClaude(messages){
+  const res = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system: SYSTEM_PROMPT, messages })
   });
 
-  // FIX #3 : messages d'erreur différenciés
   if(!res.ok){
-    const err=await res.json().catch(()=>({}));
-    const code=res.status;
-    if(code===401)throw new Error('Clé API invalide ou expirée (401)');
-    if(code===429)throw new Error('Trop de requêtes — attends quelques secondes (429)');
-    if(code===529)throw new Error('Claude est surchargé en ce moment, réessaie dans un instant (529)');
-    throw new Error(err.error?.message||`Erreur API ${code}`);
+    const err = await res.json().catch(()=>({}));
+    const code = res.status;
+    if(code===429) throw new Error('Trop de requêtes — attends quelques secondes (429)');
+    if(code===529) throw new Error('Claude est surchargé, réessaie dans un instant (529)');
+    throw new Error(err.error || `Erreur serveur ${code}`);
   }
   return res.json();
 }
@@ -677,7 +659,6 @@ score élevé = forte probabilité de manipulation. Sois précis et professionne
 async function doFile(){
   if(analyzing)return;
   if(!b64){showErr('❌ Sélectionne d\'abord une image.');return}
-  if(!APIKEY){showErr('❌ Clé API non configurée.');return}
   analyzing=true;
   startScan();
   document.getElementById('analyze-btn').disabled=true;
@@ -717,7 +698,6 @@ async function doUrl(){
     return;
   }
 
-  if(!APIKEY){showErr('❌ Clé API non configurée.');return}
   analyzing=true;
   startScan();
   document.getElementById('url-go').disabled=true;
