@@ -9,10 +9,13 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--neon:#0ff;--neon2:#f0f;--neon3:#ff0;--red:#ff2244;--green:#39ff14;--bg:#000205}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:#e0ffff;font-family:'Share Tech Mono',monospace;overflow-x:hidden;cursor:none}
-#cur{position:fixed;width:12px;height:12px;background:var(--neon);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 20px var(--neon),0 0 40px var(--neon)}
-#cur2{position:fixed;width:50px;height:50px;border:1px solid rgba(0,255,255,0.5);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:all 0.12s ease;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
-#cur3{position:fixed;width:80px;height:80px;border:1px solid rgba(0,255,255,0.15);pointer-events:none;z-index:99997;transform:translate(-50%,-50%) rotate(45deg);transition:all 0.22s ease}
+/* Curseur par défaut en fallback si JS échoue */
+body{background:var(--bg);color:#e0ffff;font-family:'Share Tech Mono',monospace;overflow-x:hidden;cursor:default}
+body.js-ready{cursor:none}
+#cur{position:fixed;width:12px;height:12px;background:var(--neon);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 20px var(--neon),0 0 40px var(--neon);display:none}
+#cur2{position:fixed;width:50px;height:50px;border:1px solid rgba(0,255,255,0.5);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:all 0.12s ease;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);display:none}
+#cur3{position:fixed;width:80px;height:80px;border:1px solid rgba(0,255,255,0.15);pointer-events:none;z-index:99997;transform:translate(-50%,-50%) rotate(45deg);transition:all 0.22s ease;display:none}
+body.js-ready #cur,body.js-ready #cur2,body.js-ready #cur3{display:block}
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 .scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)}
 .vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.8) 100%)}
@@ -31,55 +34,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green);animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* ===== CADENAS (clé API discrète) ===== */
-.lock-btn{
-  position:relative;
-  width:32px;height:32px;
-  border:1px solid rgba(0,255,255,0.15);
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.85rem;
-  cursor:none;
-  transition:all 0.2s;
-  color:rgba(0,255,255,0.3);
-}
-.lock-btn:hover{border-color:rgba(0,255,255,0.4);color:var(--neon);box-shadow:0 0 12px rgba(0,255,255,0.2)}
-.lock-btn.connected{border-color:rgba(57,255,20,0.3);color:var(--green)}
-.lock-btn.connected:hover{box-shadow:0 0 12px rgba(57,255,20,0.2)}
 
-/* ===== API MODAL ===== */
-.modal-overlay{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,0.85);
-  backdrop-filter:blur(8px);
-  display:none;align-items:center;justify-content:center;
-}
-.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{
-  border:1px solid rgba(0,255,255,0.2);
-  background:rgba(0,2,5,0.98);
-  padding:40px;
-  width:100%;max-width:480px;
-  position:relative;
-  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
-  animation:slideUp 0.25s ease;
-}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,255,255,0.3);font-size:1.2rem;cursor:none;transition:color 0.2s}
-.modal-close:hover{color:var(--neon)}
-.modal-title{font-family:'Orbitron',monospace;font-size:0.85rem;letter-spacing:3px;color:var(--neon);margin-bottom:8px}
-.modal-sub{font-size:0.65rem;letter-spacing:1.5px;color:rgba(224,255,255,0.3);margin-bottom:28px;line-height:1.7}
-.modal-input-wrap{display:flex;border:1px solid rgba(0,255,255,0.2);overflow:hidden;margin-bottom:12px;transition:all 0.2s}
-.modal-input-wrap:focus-within{border-color:rgba(0,255,255,0.5);box-shadow:0 0 20px rgba(0,255,255,0.08)}
-.modal-prefix{font-size:0.65rem;color:var(--neon);padding:0 12px;border-right:1px solid rgba(0,255,255,0.1);height:48px;display:flex;align-items:center;white-space:nowrap;text-shadow:0 0 8px var(--neon)}
-.modal-input{flex:1;background:transparent;border:none;outline:none;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#e0ffff;padding:0 14px;height:48px;caret-color:var(--neon)}
-.modal-input::placeholder{color:rgba(224,255,255,0.2)}
-.modal-save{width:100%;padding:14px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);color:var(--neon);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;cursor:none;transition:all 0.25s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
-.modal-save:hover{background:rgba(0,255,255,0.15);box-shadow:0 0 20px rgba(0,255,255,0.2)}
-.modal-note{margin-top:12px;font-size:0.58rem;letter-spacing:1px;color:rgba(224,255,255,0.2);line-height:1.6;text-align:center}
-.modal-status{margin-top:12px;font-size:0.62rem;letter-spacing:2px;text-align:center;display:none}
-.modal-status.ok{color:var(--green);display:block}
-.modal-status.err{color:var(--red);display:block}
 
 /* ===== HERO ===== */
 .hero{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;padding:120px 48px 60px;overflow:hidden}
@@ -89,8 +44,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .t2{display:block;background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeSlide 0.8s 0.2s ease both,hueRot 4s linear infinite}
 @keyframes hueRot{0%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(0deg)}100%{filter:drop-shadow(0 0 20px var(--neon)) hue-rotate(360deg)}}
 .t3{display:block;color:var(--red);text-shadow:0 0 30px var(--red),-3px -3px 0 rgba(255,34,68,0.3);animation:fadeSlide 0.8s 0.3s ease both}
-.hero-title:hover .t1{animation:glitch1 0.3s steps(1) infinite}
-@keyframes glitch1{0%{clip-path:inset(0 0 90% 0);transform:translate(-4px,0)}20%{clip-path:inset(30% 0 50% 0);transform:translate(4px,0)}40%{clip-path:inset(60% 0 20% 0);transform:translate(-2px,0)}60%{clip-path:inset(10% 0 70% 0);transform:translate(2px,0)}80%{clip-path:inset(80% 0 5% 0);transform:translate(-4px,0)}100%{clip-path:inset(0);transform:none}}
 .hero-sub{font-size:0.85rem;line-height:1.9;color:rgba(224,255,255,0.6);max-width:500px;margin:24px 0 40px;animation:fadeSlide 0.8s 0.4s ease both;border-left:2px solid var(--neon);padding-left:16px}
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap;animation:fadeSlide 0.8s 0.5s ease both}
 .btn-main{position:relative;padding:0;border:none;background:none;cursor:none;overflow:hidden}
@@ -135,6 +88,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .s-tag{font-size:0.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:12px;display:block}
 .s-title{font-family:'Black Ops One',monospace;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1;background:linear-gradient(135deg,#fff 30%,var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
 .s-sub{font-size:0.78rem;line-height:1.9;color:rgba(224,255,255,0.45);max-width:480px}
+
+/* Note limitation */
+.limitation-note{margin-top:12px;font-size:0.62rem;letter-spacing:1.5px;color:rgba(255,200,0,0.45);border-left:2px solid rgba(255,200,0,0.2);padding-left:12px;line-height:1.7;max-width:480px}
 
 .tab-switcher{display:flex;gap:2px;margin-bottom:32px;border:1px solid rgba(0,255,255,0.15);background:rgba(0,255,255,0.03);padding:4px;width:fit-content}
 .tab-btn{padding:10px 28px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(0,255,255,0.4);border:none;background:transparent;cursor:none;transition:all 0.25s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
@@ -233,46 +189,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .feat-name{font-family:'Orbitron',monospace;font-weight:700;font-size:0.85rem;letter-spacing:2px;margin-bottom:12px;color:#fff}
 .feat-desc{font-size:0.72rem;line-height:1.8;color:rgba(224,255,255,0.4)}
 
-/* TECH */
-.tech-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.tech-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
-.tech-card{border:1px solid rgba(0,255,255,0.1);padding:32px;position:relative;overflow:hidden;transition:all 0.3s;cursor:none;background:linear-gradient(135deg,rgba(0,255,255,0.02),transparent)}
-.tech-card:hover{border-color:rgba(0,255,255,0.4);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,255,0.1)}
-.tc-acc{height:2px;margin-bottom:24px;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-.tc-icon{font-size:2rem;margin-bottom:16px;display:block}
-.tc-name{font-family:'Orbitron',monospace;font-weight:700;font-size:0.85rem;letter-spacing:2px;color:#fff;margin-bottom:4px}
-.tc-role{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon);margin-bottom:12px}
-.tc-desc{font-size:0.7rem;line-height:1.8;color:rgba(224,255,255,0.38)}
-
-/* TEAM */
-.team-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.team-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:64px}
-.team-card{background:var(--bg);padding:44px;position:relative;overflow:hidden;transition:background 0.3s;cursor:none}
-.team-card:hover{background:rgba(0,255,255,0.03)}
-.team-avatar{width:80px;height:80px;border:1px solid rgba(0,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:24px;transition:all 0.3s}
-.team-card:hover .team-avatar{border-color:var(--neon);box-shadow:0 0 30px rgba(0,255,255,0.3)}
-.t-name{font-family:'Orbitron',monospace;font-weight:700;font-size:1rem;letter-spacing:2px;color:#fff;margin-bottom:4px}
-.t-role{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon2);margin-bottom:20px}
-.t-skills{display:flex;flex-wrap:wrap;gap:6px}
-.t-skill{font-size:0.56rem;letter-spacing:1.5px;padding:4px 10px;border:1px solid rgba(0,255,255,0.12);color:rgba(0,255,255,0.45)}
-
-/* ROADMAP */
-.roadmap-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
-.road-timeline{position:relative;margin-top:64px;padding-left:60px}
-.road-timeline::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--neon),var(--neon2),rgba(0,255,255,0.1))}
-.road-item{position:relative;margin-bottom:48px}
-.road-item::before{content:'';position:absolute;left:-48px;top:8px;width:10px;height:10px;background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.3);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
-.road-item.done::before{background:var(--green);border-color:var(--green);box-shadow:0 0 15px var(--green)}
-.road-item.active::before{background:var(--neon);border-color:var(--neon);box-shadow:0 0 20px var(--neon);animation:diamondPulse 1.5s infinite}
-@keyframes diamondPulse{0%,100%{box-shadow:0 0 20px var(--neon)}50%{box-shadow:0 0 40px var(--neon),0 0 80px rgba(0,255,255,0.4)}}
-.road-box{border:1px solid rgba(0,255,255,0.1);padding:28px 32px;background:rgba(0,255,255,0.02);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)}
-.road-item.done .road-box{border-color:rgba(57,255,20,0.2);background:rgba(57,255,20,0.02)}
-.road-item.active .road-box{border-color:rgba(0,255,255,0.3);background:rgba(0,255,255,0.04);box-shadow:0 0 30px rgba(0,255,255,0.08)}
-.road-phase{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
-.road-item.done .road-phase{color:var(--green)}.road-item.active .road-phase{color:var(--neon)}.road-item .road-phase{color:rgba(224,255,255,0.3)}
-.road-title{font-family:'Orbitron',monospace;font-weight:700;font-size:1rem;letter-spacing:2px;color:#fff;margin-bottom:8px}
-.road-desc{font-size:0.7rem;line-height:1.8;color:rgba(224,255,255,0.38)}
-
 footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,2,5,0.9)}
 .footer-logo{display:flex;align-items:center;gap:10px}
 .footer-logo-t{font-family:'Orbitron',monospace;font-weight:900;font-size:1rem;letter-spacing:4px;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -281,12 +197,73 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 
 @keyframes fadeSlide{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
+/* ===== ÉCRAN MOT DE PASSE ===== */
+#gate{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+}
+#gate.unlocked{animation:gateOut 0.6s ease forwards}
+@keyframes gateOut{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-40px);pointer-events:none;display:none}
+}
+.gate-logo{font-family:'Black Ops One',monospace;font-size:clamp(3rem,8vw,6rem);background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:6px;margin-bottom:8px;animation:fadeSlide 0.6s ease both}
+.gate-sub{font-size:0.6rem;letter-spacing:6px;color:rgba(0,255,255,0.3);text-transform:uppercase;margin-bottom:60px;animation:fadeSlide 0.6s 0.1s ease both}
+.gate-box{
+  border:1px solid rgba(0,255,255,0.2);
+  padding:48px;width:100%;max-width:400px;
+  background:rgba(0,255,255,0.02);
+  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+  animation:fadeSlide 0.6s 0.2s ease both;
+  position:relative;overflow:hidden;
+}
+.gate-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);
+  animation:scanAnim 3s ease-in-out infinite;
+}
+.gate-label{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(0,255,255,0.4);margin-bottom:12px;display:block}
+.gate-input-wrap{
+  display:flex;border:1px solid rgba(0,255,255,0.2);
+  overflow:hidden;margin-bottom:16px;transition:all 0.2s;
+}
+.gate-input-wrap:focus-within{border-color:rgba(0,255,255,0.6);box-shadow:0 0 20px rgba(0,255,255,0.1)}
+.gate-prefix{font-size:0.7rem;color:var(--neon);padding:0 14px;border-right:1px solid rgba(0,255,255,0.1);height:52px;display:flex;align-items:center;text-shadow:0 0 8px var(--neon)}
+.gate-input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:'Share Tech Mono',monospace;font-size:0.9rem;
+  color:#e0ffff;padding:0 16px;height:52px;caret-color:var(--neon);
+  letter-spacing:3px;
+}
+.gate-input::placeholder{color:rgba(224,255,255,0.15);letter-spacing:2px}
+.gate-btn{
+  width:100%;padding:16px;
+  background:rgba(0,255,255,0.08);
+  border:1px solid rgba(0,255,255,0.25);
+  color:var(--neon);font-family:'Orbitron',monospace;
+  font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;
+  cursor:pointer;transition:all 0.25s;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.gate-btn:hover{background:rgba(0,255,255,0.15);box-shadow:0 0 25px rgba(0,255,255,0.2)}
+.gate-err{
+  margin-top:14px;font-size:0.62rem;letter-spacing:2px;
+  color:var(--red);text-align:center;height:16px;
+  animation:errShake 0.3s ease;
+}
+@keyframes errShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.gate-dots{display:flex;justify-content:center;gap:8px;margin-top:28px}
+.gate-dot{width:5px;height:5px;border-radius:50%;background:rgba(0,255,255,0.15);transition:background 0.2s}
+.gate-dot.filled{background:var(--neon);box-shadow:0 0 8px var(--neon)}
+
 @media(max-width:900px){
   .hero-right{display:none}
   nav{padding:16px 20px}.nav-center{display:none}
-  .hero,.upload-section,.features-section,.tech-section,.team-section,.roadmap-section{padding:60px 20px}
+  .hero,.upload-section,.features-section{padding:60px 20px}
   .stats{grid-template-columns:repeat(2,1fr)}
-  .feat-grid,.tech-cards,.team-cards{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr}
   footer{flex-direction:column;gap:16px;text-align:center;padding:32px 20px}
 }
 </style>
@@ -297,19 +274,23 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 <div class="scanlines"></div><div class="vignette"></div>
 <canvas id="bg-canvas"></canvas>
 
-<!-- API MODAL (invisible par défaut) -->
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
-    <div class="modal-title">🔑 CONNEXION IA</div>
-    <div class="modal-sub">Entre ta clé API Anthropic pour activer l'analyse deepfake en temps réel.<br>Elle est sauvegardée localement — jamais envoyée ailleurs.</div>
-    <div class="modal-input-wrap">
-      <div class="modal-prefix">sk-ant-</div>
-      <input class="modal-input" id="modal-key" type="password" placeholder="api03-XXXXXXXXXX..." autocomplete="off"/>
+<!-- ÉCRAN MOT DE PASSE -->
+<div id="gate">
+  <div class="gate-logo">DEEPSHIELD</div>
+  <div class="gate-sub">Système sécurisé — Accès restreint</div>
+  <div class="gate-box">
+    <span class="gate-label">// Mot de passe requis</span>
+    <div class="gate-input-wrap">
+      <div class="gate-prefix">⬡</div>
+      <input class="gate-input" id="gate-input" type="password" placeholder="••••••••" autocomplete="off" aria-label="Mot de passe"/>
     </div>
-    <button class="modal-save" onclick="saveKey()">⚡ Activer l'analyse</button>
-    <div class="modal-status" id="modal-status"></div>
-    <div class="modal-note">Clé stockée dans ton navigateur uniquement • Jamais transmise à un tiers</div>
+    <button class="gate-btn" onclick="checkPassword()">⚡ Accéder</button>
+    <div class="gate-err" id="gate-err"></div>
+    <div class="gate-dots" id="gate-dots">
+      <div class="gate-dot"></div><div class="gate-dot"></div>
+      <div class="gate-dot"></div><div class="gate-dot"></div>
+      <div class="gate-dot"></div><div class="gate-dot"></div>
+    </div>
   </div>
 </div>
 
@@ -330,8 +311,6 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
       <div class="status-dot"></div>
       <span id="nav-st">IA OPÉRATIONNELLE</span>
     </div>
-    <!-- Petit cadenas discret -->
-    <div class="lock-btn" id="lock-btn" onclick="openModal()" title="Configuration IA">🔒</div>
   </div>
 </nav>
 
@@ -403,28 +382,31 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
     <span class="s-tag">// 01 — Interface d'analyse réelle</span>
     <div class="s-title">Déposez.<br>Collez. Analysez.</div>
     <p class="s-sub">Upload une image ou colle une URL directe. Claude Vision l'analyse en profondeur et retourne un verdict avec explication détaillée en français.</p>
+    <p class="limitation-note">⚠ Note : Claude Vision est un modèle généraliste. Les scores sont indicatifs — non mesurés sur un benchmark deepfake certifié.</p>
   </div>
 
   <div class="tab-switcher">
-    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')">📁 Image / Fichier</button>
-    <button class="tab-btn" id="tab-url" onclick="switchTab('url')">🔗 URL directe</button>
+    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')" aria-label="Analyser par fichier">📁 Image / Fichier</button>
+    <button class="tab-btn" id="tab-url" onclick="switchTab('url')" aria-label="Analyser par URL">🔗 URL directe</button>
   </div>
 
   <!-- FILE -->
   <div class="dropzone active-panel" id="panel-file"
        onclick="document.getElementById('file-input').click()"
        ondragover="event.preventDefault()"
-       ondrop="handleDrop(event)">
+       ondrop="handleDrop(event)"
+       role="button"
+       aria-label="Zone de dépôt d'image">
     <div class="dz-corner dz-tl"></div><div class="dz-corner dz-tr"></div><div class="dz-corner dz-bl"></div><div class="dz-corner dz-br"></div>
     <span class="dz-icon">🔬</span>
     <div class="dz-main">GLISSER L'IMAGE ICI</div>
-    <div class="dz-sub">ou cliquer pour sélectionner</div>
+    <div class="dz-sub">ou cliquer pour sélectionner — max 5 Mo</div>
     <div class="dz-formats"><span class="fmt-tag">JPG</span><span class="fmt-tag">PNG</span><span class="fmt-tag">WEBP</span><span class="fmt-tag">GIF</span></div>
   </div>
   <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)"/>
 
   <div class="img-preview-wrap" id="prev-wrap">
-    <img class="img-preview" id="prev-img" src="" alt=""/>
+    <img class="img-preview" id="prev-img" src="" alt="Aperçu de l'image à analyser"/>
     <div class="img-lbl" id="prev-lbl"></div>
   </div>
   <div class="analyze-wrap" id="analyze-wrap">
@@ -435,14 +417,14 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   <div class="url-panel" id="panel-url">
     <div class="url-wrap">
       <div class="url-pre">URL://</div>
-      <input class="url-in" id="url-in" type="text" placeholder="https://exemple.com/photo.jpg" autocomplete="off" spellcheck="false"/>
-      <button class="url-go" id="url-go" onclick="doUrl()">⚡ Analyser</button>
+      <input class="url-in" id="url-in" type="text" placeholder="https://exemple.com/photo.jpg" autocomplete="off" spellcheck="false" aria-label="URL de l'image à analyser"/>
+      <button class="url-go" id="url-go" onclick="doUrl()" aria-label="Lancer l'analyse">⚡ Analyser</button>
     </div>
     <div class="url-hint"><span>🖼 Lien direct image (.jpg .png .webp)</span><span>📸 Imgur, Reddit, etc.</span></div>
   </div>
 
   <!-- SCAN -->
-  <div class="scan-box" id="scan-box">
+  <div class="scan-box" id="scan-box" role="status" aria-live="polite">
     <div class="scan-line"></div>
     <div class="scan-txt">ANALYSE IA EN COURS...</div>
     <div class="scan-steps">
@@ -455,18 +437,18 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   </div>
 
   <!-- RESULT -->
-  <div class="result-box" id="result-box">
+  <div class="result-box" id="result-box" role="region" aria-label="Résultat de l'analyse">
     <div class="res-top">
       <div><div class="res-verdict" id="res-verdict"></div><div class="res-src" id="res-src"></div></div>
       <div class="res-score" id="res-score"></div>
     </div>
     <div class="res-text" id="res-text"></div>
     <div class="res-bars" id="res-bars"></div>
-    <div class="res-note">* Analyse Claude Vision — résultat indicatif</div>
+    <div class="res-note">* Analyse Claude Vision — résultat indicatif, non certifié</div>
   </div>
 
   <!-- ERROR -->
-  <div class="error-box" id="error-box">
+  <div class="error-box" id="error-box" role="alert">
     <div class="error-txt" id="error-txt"></div>
   </div>
 
@@ -491,17 +473,9 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
     <div class="feat-card"><div class="feat-num">03</div><div class="feat-icon-wrap">🎭</div><div class="feat-name">Analyse Faciale</div><p class="feat-desc">Détection des incohérences faciales : asymétrie anormale, dents générées, flou sélectif, transitions de peau artificielles.</p></div>
     <div class="feat-card"><div class="feat-num">04</div><div class="feat-icon-wrap">🔗</div><div class="feat-name">Analyse par URL</div><p class="feat-desc">Collez directement un lien image direct. Claude Vision récupère et analyse le contenu sans téléchargement manuel.</p></div>
     <div class="feat-card"><div class="feat-num">05</div><div class="feat-icon-wrap">⚡</div><div class="feat-name">Résultat en 5s</div><p class="feat-desc">Analyse complète en moins de 5 secondes. Rapport avec verdict FAKE / REAL / UNCERTAIN et détail des 4 critères.</p></div>
-    <div class="feat-card"><div class="feat-num">06</div><div class="feat-icon-wrap">🔒</div><div class="feat-name">100% Privé</div><p class="feat-desc">Aucune image stockée. La clé API est sauvegardée dans ton navigateur uniquement. Zéro serveur intermédiaire.</p></div>
+    <div class="feat-card"><div class="feat-num">06</div><div class="feat-icon-wrap">🔒</div><div class="feat-name">100% Privé</div><p class="feat-desc">Aucune image stockée. La clé API est en session uniquement — effacée dès que tu fermes l'onglet. Zéro serveur intermédiaire.</p></div>
   </div>
 </section>
-
-<!-- TECH -->
-
-
-<!-- TEAM -->
-
-<!-- ROADMAP -->
-
 
 <footer>
   <div class="footer-logo">
@@ -513,6 +487,47 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 </footer>
 
 <script>
+// ===== MOT DE PASSE — change la valeur ci-dessous =====
+const PASSWORD = 'deepshield2026'; // ← CHANGE ÇA
+
+function checkPassword(){
+  const val = document.getElementById('gate-input').value;
+  const errEl = document.getElementById('gate-err');
+  const dots = document.querySelectorAll('.gate-dot');
+  dots.forEach((d,i) => d.classList.toggle('filled', i < val.length));
+  if(val === PASSWORD){
+    sessionStorage.setItem('ds_auth','1');
+    const gate = document.getElementById('gate');
+    gate.classList.add('unlocked');
+    setTimeout(()=>{ gate.style.display='none'; }, 600);
+    errEl.textContent = '';
+  } else {
+    errEl.textContent = '⚠ Mot de passe incorrect';
+    errEl.style.animation = 'none';
+    requestAnimationFrame(()=>{ errEl.style.animation = 'errShake 0.3s ease'; });
+    document.getElementById('gate-input').value = '';
+    document.querySelectorAll('.gate-dot').forEach(d=>d.classList.remove('filled'));
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const input = document.getElementById('gate-input');
+  if(input){
+    input.addEventListener('input', ()=>{
+      const dots = document.querySelectorAll('.gate-dot');
+      dots.forEach((d,i)=>d.classList.toggle('filled', i < input.value.length));
+    });
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPassword(); });
+    input.focus();
+  }
+  if(sessionStorage.getItem('ds_auth')==='1'){
+    document.getElementById('gate').style.display='none';
+  }
+});
+
+// ===== JS READY — active le curseur custom =====
+document.body.classList.add('js-ready');
+
 // CURSOR
 const cur=document.getElementById('cur'),cur2=document.getElementById('cur2'),cur3=document.getElementById('cur3');
 let mx=0,my=0,r2x=0,r2y=0,r3x=0,r3y=0;
@@ -521,76 +536,49 @@ function animCursor(){r2x+=(mx-r2x)*0.15;r2y+=(my-r2y)*0.15;r3x+=(mx-r3x)*0.08;r
 
 // PARTICLES
 const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}resize();window.addEventListener('resize',resize);
+let W=0,H=0;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
 const PARTS=[];
-class P{constructor(){this.r()}r(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.a=Math.random()*.4+.05;this.s=Math.random()*2+.5;this.c=Math.random()>.7?'255,0,255':'0,255,255';this.l=1;this.d=Math.random()*.003+.001}u(){this.x+=this.vx;this.y+=this.vy;this.l-=this.d;if(this.l<=0||this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.r()}draw(){ctx.save();ctx.globalAlpha=this.a*this.l;ctx.fillStyle=`rgba(${this.c},1)`;ctx.shadowBlur=8;ctx.shadowColor=`rgba(${this.c},.8)`;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.restore()}}
+class P{constructor(){this.r()}r(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.a=Math.random()*.4+.05;this.s=Math.random()*2+.5;this.c=Math.random()>.7?'255,0,255':'0,255,255';this.l=1;this.d=Math.random()*.003+.001}u(){this.x+=this.vx;this.y+=this.vy;this.l-=this.d;if(this.l<=0||this.x<0||this.x>W||this.y<0||this.y>H)this.r()}draw(){ctx.save();ctx.globalAlpha=this.a*this.l;ctx.fillStyle=`rgba(${this.c},1)`;ctx.shadowBlur=8;ctx.shadowColor=`rgba(${this.c},.8)`;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.restore()}}
 for(let i=0;i<80;i++)PARTS.push(new P());
-function drawGrid(){ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=.5;const g=80;for(let x=0;x<canvas.width;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}for(let y=0;y<canvas.height;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}}
+function drawGrid(){ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=.5;const g=80;for(let x=0;x<W;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
 function connectP(){for(let i=0;i<PARTS.length;i++)for(let j=i+1;j<PARTS.length;j++){const dx=PARTS[i].x-PARTS[j].x,dy=PARTS[i].y-PARTS[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.save();ctx.globalAlpha=(1-d/120)*.12;ctx.strokeStyle='rgba(0,255,255,1)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(PARTS[i].x,PARTS[i].y);ctx.lineTo(PARTS[j].x,PARTS[j].y);ctx.stroke();ctx.restore()}}}
-function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)}anim();
+function anim(){ctx.clearRect(0,0,W,H);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)}anim();
 
-// SCROLL
-const obs=new IntersectionObserver(en=>{en.forEach((e,i)=>{if(e.isIntersecting){e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;obs.unobserve(e.target)}})},{threshold:.1});
-document.querySelectorAll('.feat-card,.tech-card,.team-card,.stat,.road-item,.metric-item').forEach(el=>obs.observe(el));
-document.querySelector('.hero-title').addEventListener('click',function(){this.querySelectorAll('span').forEach(s=>{s.style.transform=`translate(${(Math.random()-.5)*20}px,${(Math.random()-.5)*10}px)`;s.style.filter='hue-rotate(90deg) saturate(3)';setTimeout(()=>{s.style.transform='';s.style.filter=''},200)})});
+// ===== CLÉ API — remplace la valeur ci-dessous par ta clé Anthropic =====
+// ⚠ Ne partage JAMAIS ce fichier avec ta clé dedans publiquement
+// Conseil : fixe un budget mensuel sur console.anthropic.com pour limiter les coûts
+const APIKEY = 'vck_8kt23By5uUUla0oSc3qmRT6Cs18TZbdzMfFesQnL5eO7NW2DCL3oieff'; // ex: 'sk-ant-api03-XXXXXXXXXX...'
 
 // TAB
 function switchTab(t){
-  ['file','url'].forEach(x=>{document.getElementById('panel-'+x).classList.remove('active-panel');document.getElementById('tab-'+x).classList.remove('active')});
+  ['file','url'].forEach(x=>{
+    document.getElementById('panel-'+x).classList.remove('active-panel');
+    document.getElementById('tab-'+x).classList.remove('active')
+  });
   document.getElementById('panel-'+t).classList.add('active-panel');
   document.getElementById('tab-'+t).classList.add('active');
   clearUI();
 }
 
-// ===== API KEY — localStorage, invisible =====
-let APIKEY = localStorage.getItem('ds_key') || '';
-
-function updateLockUI(){
-  const btn = document.getElementById('lock-btn');
-  const st  = document.getElementById('nav-st');
-  if(APIKEY){
-    btn.textContent = '🔓';
-    btn.classList.add('connected');
-    st.textContent = 'IA CONNECTÉE';
-  } else {
-    btn.textContent = '🔒';
-    btn.classList.remove('connected');
-    st.textContent = 'IA OPÉRATIONNELLE';
-  }
-}
-updateLockUI();
-
-function openModal(){
-  document.getElementById('modal').classList.add('open');
-  document.getElementById('modal-key').value = '';
-  document.getElementById('modal-status').className='modal-status';
-  document.getElementById('modal-status').textContent='';
-}
-function closeModal(e){
-  if(e.target === document.getElementById('modal'))
-    document.getElementById('modal').classList.remove('open');
-}
-function saveKey(){
-  const v = document.getElementById('modal-key').value.trim();
-  if(!v){ showModalStatus('err','Entre une clé valide'); return; }
-  APIKEY = 'sk-ant-' + v;
-  localStorage.setItem('ds_key', APIKEY);
-  showModalStatus('ok','✓ Clé sauvegardée — IA activée !');
-  updateLockUI();
-  setTimeout(()=>document.getElementById('modal').classList.remove('open'), 1200);
-}
-function showModalStatus(cls,msg){
-  const el=document.getElementById('modal-status');
-  el.className='modal-status '+cls;
-  el.textContent=msg;
-}
-document.getElementById('modal-key').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey()});
-
 // FILE
 let b64=null,mime=null;
 function handleFile(e){const f=e.target.files[0];if(f)loadImg(f)}
-function handleDrop(e){e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f)}
+function handleDrop(e){
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/'))loadImg(f);
+}
+
+// FIX #6 : limite de taille
+const MAX_SIZE=5*1024*1024; // 5 Mo
+
 function loadImg(f){
+  if(f.size>MAX_SIZE){
+    showErr('❌ Image trop lourde — max 5 Mo. La tienne fait '+(f.size/1024/1024).toFixed(1)+' Mo.');
+    return;
+  }
   clearUI();mime=f.type;
   const r=new FileReader();
   r.onload=ev=>{
@@ -600,19 +588,48 @@ function loadImg(f){
     document.getElementById('prev-wrap').classList.add('show');
     document.getElementById('analyze-wrap').classList.add('show');
   };
+  r.onerror=()=>showErr('❌ Impossible de lire ce fichier.');
   r.readAsDataURL(f);
 }
 
 // SCAN ANIM
 const SIDS=['s1','s2','s3','s4','s5'];
-function startScan(){clearUI();document.getElementById('scan-box').classList.add('show');SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});let i=0;function next(){if(i>0)document.getElementById(SIDS[i-1]).classList.replace('run','done');if(i<SIDS.length){document.getElementById(SIDS[i]).classList.add('run');i++;setTimeout(next,500+Math.random()*300)}}next()}
-function stopScan(){document.getElementById('scan-box').classList.remove('show');SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')})}
-function clearUI(){document.getElementById('scan-box').classList.remove('show');document.getElementById('result-box').className='result-box';document.getElementById('error-box').classList.remove('show')}
+let scanTimer=null;
+function startScan(){
+  clearUI();
+  document.getElementById('scan-box').classList.add('show');
+  SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});
+  let i=0;
+  function next(){
+    if(i>0)document.getElementById(SIDS[i-1]).classList.replace('run','done');
+    if(i<SIDS.length){
+      document.getElementById(SIDS[i]).classList.add('run');
+      i++;
+      scanTimer=setTimeout(next,500+Math.random()*300);
+    }
+  }
+  next();
+}
+function stopScan(){
+  if(scanTimer)clearTimeout(scanTimer);
+  document.getElementById('scan-box').classList.remove('show');
+  SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});
+}
+function clearUI(){
+  stopScan();
+  document.getElementById('result-box').className='result-box';
+  document.getElementById('error-box').classList.remove('show');
+}
 
-// CLAUDE CALL
+// Debounce pour éviter le spam
+let analyzing=false;
+
+// ===== FIX #1 : bon nom de modèle =====
+const MODEL='claude-opus-4-5-20251101';
+
 async function callClaude(messages){
   if(!APIKEY){
-    showErr('❌ Clé API manquante — clique sur le cadenas 🔒 en haut à droite pour configurer l\'IA.');
+    showErr('❌ Clé API non configurée — ajoute ta clé dans le code source.');
     return null;
   }
   const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -624,10 +641,10 @@ async function callClaude(messages){
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body:JSON.stringify({
-      model:'claude-opus-4-5',
+      model: MODEL,
       max_tokens:1024,
       system:`Tu es DeepShield, expert en détection de deepfakes et images manipulées.
-Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après) :
+Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après, aucun bloc markdown) :
 {
   "verdict": "FAKE" | "REAL" | "UNCERTAIN",
   "score": <0-100, probabilité de manipulation>,
@@ -639,67 +656,126 @@ Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après)
     "global_confidence": <0-100>
   }
 }
-score élevé = forte probabilité de manipulation. Sois précis et professionnel.`,
+score élevé = forte probabilité de manipulation. Sois précis et professionnel. Réponds SEULEMENT avec le JSON, sans aucun texte supplémentaire.`,
       messages
     })
   });
-  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`Erreur API ${res.status}`)}
+
+  // FIX #3 : messages d'erreur différenciés
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    const code=res.status;
+    if(code===401)throw new Error('Clé API invalide ou expirée (401)');
+    if(code===429)throw new Error('Trop de requêtes — attends quelques secondes (429)');
+    if(code===529)throw new Error('Claude est surchargé en ce moment, réessaie dans un instant (529)');
+    throw new Error(err.error?.message||`Erreur API ${code}`);
+  }
   return res.json();
 }
 
 // ANALYZE FILE
 async function doFile(){
+  if(analyzing)return;
   if(!b64){showErr('❌ Sélectionne d\'abord une image.');return}
-  if(!APIKEY){showErr('❌ Clique sur le cadenas 🔒 en haut à droite pour configurer ta clé API.');return}
-  startScan();document.getElementById('analyze-btn').disabled=true;
+  if(!APIKEY){showErr('❌ Clé API non configurée.');return}
+  analyzing=true;
+  startScan();
+  document.getElementById('analyze-btn').disabled=true;
   try{
     const data=await callClaude([{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime||'image/jpeg',data:b64}},
       {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
     ]}]);
     if(data)showResult(data,'Image uploadée');
-  }catch(e){showErr('❌ Erreur API : '+e.message)}
-  finally{stopScan();document.getElementById('analyze-btn').disabled=false}
+  }catch(e){
+    showErr('❌ Erreur : '+e.message);
+  }finally{
+    stopScan();
+    document.getElementById('analyze-btn').disabled=false;
+    analyzing=false;
+  }
 }
 
 // ANALYZE URL
 async function doUrl(){
-  const url=document.getElementById('url-in').value.trim();
-  if(!url){showErr('❌ Entre une URL d\'image directe.');return}
-  if(!APIKEY){showErr('❌ Clique sur le cadenas 🔒 en haut à droite pour configurer ta clé API.');return}
-  startScan();document.getElementById('url-go').disabled=true;
+  if(analyzing)return;
+  const rawUrl=document.getElementById('url-in').value.trim();
+  if(!rawUrl){showErr('❌ Entre une URL d\'image directe.');return}
+
+  // FIX #4 : validation URL stricte
+  let parsedUrl;
+  try{
+    parsedUrl=new URL(rawUrl);
+    if(!['http:','https:'].includes(parsedUrl.protocol))throw new Error('Protocole non autorisé');
+    // Bloquer les IPs privées et localhost
+    const host=parsedUrl.hostname;
+    if(/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)){
+      throw new Error('URL locale non autorisée');
+    }
+  }catch(e){
+    showErr('❌ URL invalide — utilise une URL https:// pointant vers une image publique.\n'+e.message);
+    return;
+  }
+
+  if(!APIKEY){showErr('❌ Clé API non configurée.');return}
+  analyzing=true;
+  startScan();
+  document.getElementById('url-go').disabled=true;
   try{
     const data=await callClaude([{role:'user',content:[
-      {type:'image',source:{type:'url',url}},
+      {type:'image',source:{type:'url',url:parsedUrl.href}},
       {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
     ]}]);
-    if(data)showResult(data,url);
-  }catch(e){showErr('❌ Erreur : '+e.message+'\n\n⚠ L\'URL doit pointer directement vers une image (.jpg .png .webp)')}
-  finally{stopScan();document.getElementById('url-go').disabled=false}
+    if(data)showResult(data,parsedUrl.href);
+  }catch(e){
+    showErr('❌ Erreur : '+e.message+'\n\n⚠ L\'URL doit pointer directement vers une image (.jpg .png .webp) accessible publiquement.');
+  }finally{
+    stopScan();
+    document.getElementById('url-go').disabled=false;
+    analyzing=false;
+  }
 }
 
-// SHOW RESULT
+// SHOW RESULT — FIX #2 : parsing JSON robuste
 function showResult(apiData,src){
   let p;
-  try{const t=apiData.content.map(c=>c.text||'').join('');p=JSON.parse(t.replace(/```json|```/g,'').trim())}
-  catch(e){showErr('❌ Impossible de parser la réponse IA. Réessaie.');return}
-  const verdict=p.verdict||'UNCERTAIN',score=p.score||0,cr=p.criteria||{};
+  try{
+    const t=apiData.content.map(c=>c.text||'').join('');
+    // Extraction robuste : cherche le premier objet JSON complet
+    const match=t.match(/\{[\s\S]*\}/);
+    if(!match)throw new Error('Pas de JSON trouvé dans la réponse');
+    p=JSON.parse(match[0]);
+  }catch(e){
+    showErr('❌ Impossible de parser la réponse IA. Réessaie. ('+e.message+')');
+    return;
+  }
+
+  const verdict=(p.verdict||'UNCERTAIN').toUpperCase();
+  const score=Math.min(100,Math.max(0,parseInt(p.score)||0));
+  const cr=p.criteria||{};
   const cls=verdict==='FAKE'?'fake':verdict==='REAL'?'real':'uncertain';
   const col=verdict==='FAKE'?'#ff2244':verdict==='REAL'?'#39ff14':'#ffff00';
+
   const box=document.getElementById('result-box');
   box.className='result-box show '+cls;
+
   const vEl=document.getElementById('res-verdict');
   vEl.textContent=verdict==='FAKE'?'⚠ DEEPFAKE / MANIPULATION DÉTECTÉE':verdict==='REAL'?'✓ CONTENU AUTHENTIQUE':'⚡ RÉSULTAT INCERTAIN';
   vEl.className='res-verdict '+cls;
+
   const sEl=document.getElementById('res-score');
-  sEl.textContent=score+'%';sEl.className='res-score '+cls;
+  sEl.textContent=score+'%';
+  sEl.className='res-score '+cls;
+
   document.getElementById('res-src').textContent='▸ '+(src.length>60?src.slice(0,57)+'...':src);
   document.getElementById('res-text').textContent=p.summary||'';
+
+  const clamp=v=>Math.min(100,Math.max(0,parseInt(v)||0));
   const barData=[
-    {l:'Cohérence visuelle',v:cr.visual_coherence??50},
-    {l:'Artefacts faciaux',v:cr.facial_artifacts??50},
-    {l:'Patterns IA',v:cr.generation_patterns??50},
-    {l:'Confiance analyse',v:cr.global_confidence??50},
+    {l:'Cohérence visuelle',v:clamp(cr.visual_coherence)},
+    {l:'Artefacts faciaux',v:clamp(cr.facial_artifacts)},
+    {l:'Patterns IA',v:clamp(cr.generation_patterns)},
+    {l:'Confiance analyse',v:clamp(cr.global_confidence)},
   ];
   document.getElementById('res-bars').innerHTML=barData.map(b=>`
     <div class="rbar-row">
@@ -707,16 +783,28 @@ function showResult(apiData,src){
       <div class="rbar-track"><div class="rbar-fill" style="width:${b.v}%;background:${col};box-shadow:0 0 8px ${col}"></div></div>
       <div class="rbar-val" style="color:${col}">${b.v}%</div>
     </div>`).join('');
-  const mv=[cr.visual_coherence,cr.facial_artifacts,cr.generation_patterns,cr.global_confidence];
-  ['m1','m2','m3','m4'].forEach((id,i)=>{const v=mv[i]??0;document.getElementById(id).textContent=v+'%';document.getElementById(id+'b').style.width=v+'%'});
+
+  const mv=[clamp(cr.visual_coherence),clamp(cr.facial_artifacts),clamp(cr.generation_patterns),clamp(cr.global_confidence)];
+  ['m1','m2','m3','m4'].forEach((id,i)=>{
+    const v=mv[i];
+    document.getElementById(id).textContent=v+'%';
+    document.getElementById(id+'b').style.width=v+'%';
+  });
+
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function showErr(msg){stopScan();document.getElementById('error-txt').textContent=msg;document.getElementById('error-box').classList.add('show')}
+function showErr(msg){
+  stopScan();
+  document.getElementById('error-txt').textContent=msg;
+  document.getElementById('error-box').classList.add('show');
+}
+
 document.getElementById('url-in').addEventListener('keydown',e=>{if(e.key==='Enter')doUrl()});
 
-// Ouvre le modal au premier visit si pas de clé
-if(!APIKEY) setTimeout(openModal, 1500);
+// Scroll observer
+const obs=new IntersectionObserver(en=>{en.forEach((e,i)=>{if(e.isIntersecting){e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;obs.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.feat-card,.stat,.metric-item').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
