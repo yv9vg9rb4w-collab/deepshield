@@ -785,6 +785,141 @@ document.getElementById('url-in').addEventListener('keydown',e=>{if(e.key==='Ent
 // Scroll observer
 const obs=new IntersectionObserver(en=>{en.forEach((e,i)=>{if(e.isIntersecting){e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;obs.unobserve(e.target)}})},{threshold:.1});
 document.querySelectorAll('.feat-card,.stat,.metric-item').forEach(el=>obs.observe(el));
+</script><script>
+// ===== PASSWORD =====
+const PASSWORD = "yahya123"; // change ça
+
+function checkPassword(){
+  const input = document.getElementById("gate-input").value;
+  const err = document.getElementById("gate-err");
+
+  if(input === PASSWORD){
+    document.getElementById("gate").classList.add("unlocked");
+    document.body.classList.add("js-ready");
+  } else {
+    err.textContent = "❌ Mot de passe incorrect";
+  }
+}
+
+// ===== FILE =====
+let currentFile = null;
+
+function handleFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  currentFile = file;
+
+  const img = document.getElementById("prev-img");
+  img.src = URL.createObjectURL(file);
+
+  document.getElementById("prev-wrap").classList.add("show");
+  document.getElementById("analyze-wrap").classList.add("show");
+  document.getElementById("prev-lbl").textContent = file.name;
+}
+
+// Drag & drop
+function handleDrop(e){
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+
+  currentFile = file;
+
+  const img = document.getElementById("prev-img");
+  img.src = URL.createObjectURL(file);
+
+  document.getElementById("prev-wrap").classList.add("show");
+  document.getElementById("analyze-wrap").classList.add("show");
+  document.getElementById("prev-lbl").textContent = file.name;
+}
+
+// ===== ANALYSE FAKE (simulation) =====
+function simulateResult(source){
+  document.getElementById("scan-box").classList.add("show");
+
+  setTimeout(()=>{
+    document.getElementById("scan-box").classList.remove("show");
+
+    const resultBox = document.getElementById("result-box");
+    resultBox.classList.add("show");
+
+    const fakeScore = Math.floor(Math.random()*100);
+
+    let verdict = "INCERTAIN";
+    let cls = "uncertain";
+
+    if(fakeScore > 70){
+      verdict = "⚠ DEEPFAKE PROBABLE";
+      cls = "fake";
+    } else if(fakeScore < 30){
+      verdict = "✅ IMAGE AUTHENTIQUE";
+      cls = "real";
+    }
+
+    document.getElementById("res-verdict").textContent = verdict;
+    document.getElementById("res-verdict").className = "res-verdict " + cls;
+
+    document.getElementById("res-score").textContent = fakeScore + "%";
+    document.getElementById("res-score").className = "res-score " + cls;
+
+    document.getElementById("res-src").textContent = source;
+
+    document.getElementById("res-text").textContent =
+      "Analyse simulée. Pour une vraie détection, connecte une API IA (Claude, OpenAI Vision, etc).";
+
+    // Metrics
+    updateMetric("m1", fakeScore);
+    updateMetric("m2", Math.random()*100);
+    updateMetric("m3", Math.random()*100);
+    updateMetric("m4", fakeScore);
+
+  }, 2000);
+}
+
+function updateMetric(id, val){
+  val = Math.floor(val);
+  document.getElementById(id).textContent = val + "%";
+  document.getElementById(id+"b").style.width = val + "%";
+}
+
+// ===== ACTIONS =====
+function doFile(){
+  if(!currentFile) return;
+  simulateResult(currentFile.name);
+}
+
+function doUrl(){
+  const url = document.getElementById("url-in").value;
+  if(!url){
+    alert("Entre une URL");
+    return;
+  }
+
+  if(!url.match(/\.(jpg|jpeg|png|webp)$/)){
+    alert("URL invalide (doit être une image)");
+    return;
+  }
+
+  simulateResult(url);
+}
+
+// ===== TAB SWITCH =====
+function switchTab(tab){
+  document.getElementById("panel-file").classList.remove("active-panel");
+  document.getElementById("panel-url").classList.remove("active-panel");
+
+  document.getElementById("tab-file").classList.remove("active");
+  document.getElementById("tab-url").classList.remove("active");
+
+  if(tab === "file"){
+    document.getElementById("panel-file").classList.add("active-panel");
+    document.getElementById("tab-file").classList.add("active");
+  } else {
+    document.getElementById("panel-url").classList.add("active-panel");
+    document.getElementById("tab-url").classList.add("active");
+  }
+}
 </script>
 </body>
 </html>
