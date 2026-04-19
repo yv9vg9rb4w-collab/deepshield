@@ -790,37 +790,179 @@ function showErr(msg){
 
 document.getElementById('url-in').addEventListener('keydown', e=>{ if(e.key==='Enter') doUrl(); });
 
+
 // ============================================================
-// WIFI / NETWORK SPEED
+// SPEEDTEST
 // ============================================================
-async function measureSpeed(){
-  const wifiVal  = document.getElementById('wifi-val');
-  const wifiIcon = document.getElementById('wifi-icon');
-  wifiVal.textContent = 'test...';
+function openSpeedtest(){ document.getElementById('st-overlay').classList.add('open'); }
+function closeSpeedtest(){ document.getElementById('st-overlay').classList.remove('open'); }
+
+// Close on overlay click
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('st-overlay').addEventListener('click', e=>{
+    if(e.target === document.getElementById('st-overlay')) closeSpeedtest();
+  });
+});
+
+const ARC_LEN = 283; // half-circle dasharray
+
+function setGauge(mbps, color){
+  const max   = 100;
+  const ratio = Math.min(mbps / max, 1);
+  const offset = ARC_LEN - ratio * ARC_LEN;
+  const arc = document.getElementById('st-arc');
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = color;
+  document.getElementById('st-gauge-num').textContent = mbps >= 10 ? mbps.toFixed(1) : mbps.toFixed(2);
+  document.getElementById('st-gauge-num').style.color = color;
+}
+
+function resetGauge(){
+  document.getElementById('st-arc').style.strokeDashoffset = ARC_LEN;
+  document.getElementById('st-gauge-num').textContent = '—';
+  document.getElementById('st-gauge-num').style.color = '#fff';
+}
+
+function setPhase(id){
+  ['ph-ping','ph-dl','ph-ul'].forEach(p=>{
+    const el = document.getElementById(p);
+    el.classList.remove('active','done');
+  });
+  if(id) document.getElementById(id).classList.add('active');
+}
+
+function donePhase(id){
+  document.getElementById(id).classList.remove('active');
+  document.getElementById(id).classList.add('done');
+}
+
+function setStatus(txt){ document.getElementById('st-status').textContent = txt; }
+
+function getColor(mbps){
+  if(mbps >= 50) return 'var(--green)';
+  if(mbps >= 10) return 'var(--neon)';
+  if(mbps >= 2)  return 'var(--neon3)';
+  return 'var(--red)';
+}
+
+// Update nav button
+function updateNavBtn(dl, ul, ping){
+  document.getElementById('nav-wifi-icon').textContent = dl >= 10 ? '📶' : dl >= 2 ? '📶' : '📵';
+  document.getElementById('nav-wifi-val').textContent  = dl.toFixed(1) + ' Mbps';
+}
+
+async function measurePing(){
+  const times = [];
+  for(let i=0;i<4;i++){
+    const t0 = performance.now();
+    await fetch('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js?_='+Date.now()+i, {cache:'no-store', mode:'no-cors'}).catch(()=>{});
+    times.push(performance.now()-t0);
+  }
+  return Math.round(Math.min(...times));
+}
+
+async function measureDownload(){
+  // Download ~570KB file, animate gauge live
+  const url   = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?_='+Date.now();
+  const t0    = performance.now();
+  const res   = await fetch(url, {cache:'no-store'});
+  const reader= res.body.getReader();
+  let bytes   = 0;
+  while(true){
+    const {done, value} = await reader.read();
+    if(done) break;
+    bytes += value.length;
+    const elapsed = (performance.now()-t0)/1000;
+    if(elapsed > 0){
+      const live = (bytes*8)/elapsed/1_000_000;
+      setGauge(live, getColor(live));
+    }
+  }
+  const total = (performance.now()-t0)/1000;
+  return (bytes*8)/total/1_000_000;
+}
+
+async function measureUpload(){
+  // Simulate upload by timing a POST with dummy data
+  const sizes = [50000, 100000, 200000];
+  let total = 0, totalBytes = 0;
+  for(const size of sizes){
+    const data = new Uint8Array(size);
+    const t0   = performance.now();
+    await fetch('https://httpbin.org/post', {
+      method:'POST',
+      body: data,
+      mode:'no-cors',
+      cache:'no-store'
+    }).catch(()=>{});
+    const elapsed = (performance.now()-t0)/1000;
+    const live    = (size*8)/elapsed/1_000_000;
+    setGauge(live, '#ff00ff');
+    total      += elapsed;
+    totalBytes += size;
+  }
+  return (totalBytes*8)/total/1_000_000;
+}
+
+let stRunning = false;
+
+async function runSpeedtest(){
+  if(stRunning) return;
+  stRunning = true;
+
+  // Reset UI
+  document.getElementById('st-btn').disabled = true;
+  document.getElementById('st-dl').textContent   = '—';
+  document.getElementById('st-ul').textContent   = '—';
+  document.getElementById('st-ping').textContent = '—';
+  document.getElementById('st-gauge-unit').textContent = 'Mbps';
+  resetGauge();
+  setPhase(null);
+
   try{
-    const url   = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-    const start = performance.now();
-    const res   = await fetch(url+'?_='+Date.now(), {cache:'no-store'});
-    const blob  = await res.blob();
-    const end   = performance.now();
-    const mbps  = (blob.size * 8) / ((end - start) / 1000) / 1_000_000;
-    let icon, color, label;
-    if(mbps >= 50)      { icon='📶'; color='var(--green)'; label=mbps.toFixed(1)+' Mbps'; }
-    else if(mbps >= 10) { icon='📶'; color='var(--neon)';  label=mbps.toFixed(1)+' Mbps'; }
-    else if(mbps >= 2)  { icon='📶'; color='var(--neon3)'; label=mbps.toFixed(1)+' Mbps'; }
-    else                { icon='📵'; color='var(--red)';   label=mbps.toFixed(2)+' Mbps'; }
-    wifiIcon.textContent  = icon;
-    wifiVal.textContent   = label;
-    wifiVal.style.color   = color;
-    wifiIcon.style.filter = `drop-shadow(0 0 6px ${color})`;
+    // === PING ===
+    setPhase('ph-ping');
+    setStatus('Mesure du ping...');
+    document.getElementById('st-gauge-unit').textContent = 'ms';
+    const ping = await measurePing();
+    document.getElementById('st-ping').textContent = ping;
+    const pingColor = ping < 30 ? 'var(--green)' : ping < 80 ? 'var(--neon)' : ping < 150 ? 'var(--neon3)' : 'var(--red)';
+    document.getElementById('st-ping').style.color = pingColor;
+    donePhase('ph-ping');
+
+    // === DOWNLOAD ===
+    setPhase('ph-dl');
+    setStatus('Test de download en cours...');
+    document.getElementById('st-gauge-unit').textContent = 'Mbps';
+    resetGauge();
+    const dl = await measureDownload();
+    document.getElementById('st-dl').textContent = dl.toFixed(1);
+    document.getElementById('st-dl').style.color = getColor(dl);
+    setGauge(dl, getColor(dl));
+    donePhase('ph-dl');
+
+    // === UPLOAD ===
+    setPhase('ph-ul');
+    setStatus('Test upload en cours...');
+    resetGauge();
+    const ul = await measureUpload();
+    document.getElementById('st-ul').textContent = ul.toFixed(1);
+    document.getElementById('st-ul').style.color = getColor(ul);
+    setGauge(ul, '#ff00ff');
+    donePhase('ph-ul');
+
+    // Done
+    setStatus('✓ Test terminé — Download: '+dl.toFixed(1)+' Mbps | Upload: '+ul.toFixed(1)+' Mbps | Ping: '+ping+' ms');
+    updateNavBtn(dl, ul, ping);
+
   }catch(e){
-    wifiIcon.textContent = '❌';
-    wifiVal.textContent  = 'hors ligne';
-    wifiVal.style.color  = 'var(--red)';
+    setStatus('❌ Erreur : '+e.message);
+  }finally{
+    document.getElementById('st-btn').disabled = false;
+    stRunning = false;
   }
 }
-measureSpeed();
-setInterval(measureSpeed, 30000);
+
 </script>
 
 <!-- SPEEDTEST MODAL -->
