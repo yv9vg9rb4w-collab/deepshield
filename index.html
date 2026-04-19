@@ -9,7 +9,6 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--neon:#0ff;--neon2:#f0f;--neon3:#ff0;--red:#ff2244;--green:#39ff14;--bg:#000205}
 html{scroll-behavior:smooth}
-/* Curseur par défaut en fallback si JS échoue */
 body{background:var(--bg);color:#e0ffff;font-family:'Share Tech Mono',monospace;overflow-x:hidden;cursor:default}
 body.js-ready{cursor:none}
 #cur{position:fixed;width:12px;height:12px;background:var(--neon);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 20px var(--neon),0 0 40px var(--neon);display:none}
@@ -20,7 +19,6 @@ body.js-ready #cur,body.js-ready #cur2,body.js-ready #cur3{display:block}
 .scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)}
 .vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.8) 100%)}
 
-/* ===== NAV ===== */
 nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,255,255,0.1);background:rgba(0,2,5,0.8);backdrop-filter:blur(20px)}
 .logo-wrap{display:flex;align-items:center;gap:12px}
 .logo-icon{width:36px;height:36px;border:2px solid var(--neon);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 15px var(--neon),inset 0 0 15px rgba(0,255,255,0.1);animation:logoPulse 2s ease-in-out infinite}
@@ -34,9 +32,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green);animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-
-
-/* ===== HERO ===== */
 .hero{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;padding:120px 48px 60px;overflow:hidden}
 .hero-eyebrow{font-size:0.65rem;letter-spacing:6px;text-transform:uppercase;color:var(--neon2);text-shadow:0 0 10px var(--neon2);animation:fadeSlide 0.8s ease both}
 .hero-title{font-family:'Black Ops One',monospace;font-size:clamp(5rem,12vw,10rem);line-height:0.85;margin:16px 0}
@@ -52,7 +47,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .btn-ghost{padding:16px 40px;border:1px solid rgba(0,255,255,0.3);color:rgba(0,255,255,0.7);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;cursor:none;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.3s;background:transparent}
 .btn-ghost:hover{border-color:var(--neon2);color:var(--neon2);box-shadow:0 0 20px rgba(255,0,255,0.3)}
 
-/* HOLOGRAM */
 .hero-right{position:absolute;right:0;top:50%;transform:translateY(-50%);width:55vw;max-width:700px;height:100vh;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .holo-container{position:relative;width:500px;height:500px;animation:float 4s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
@@ -72,7 +66,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .conf-score{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Black Ops One',monospace;font-size:3.5rem;color:transparent;-webkit-text-stroke:1px var(--red);letter-spacing:4px;animation:confPulse 2s ease-in-out infinite}
 @keyframes confPulse{0%,100%{-webkit-text-stroke:1px var(--red)}50%{-webkit-text-stroke:1px #fff;filter:drop-shadow(0 0 40px #fff)}}
 
-/* STATS */
 .stats{position:relative;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(0,255,255,0.1);border-bottom:1px solid rgba(0,255,255,0.1)}
 .stat{padding:36px;border-right:1px solid rgba(0,255,255,0.1);position:relative;overflow:hidden;transition:background 0.3s}
 .stat:last-child{border-right:none}.stat:hover{background:rgba(0,255,255,0.02)}
@@ -82,14 +75,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .stat-bar-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);animation:barFill 2s ease both}
 @keyframes barFill{from{width:0}}
 
-/* UPLOAD */
 .upload-section{position:relative;z-index:10;padding:100px 48px}
 .section-header{margin-bottom:64px}
 .s-tag{font-size:0.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:12px;display:block}
 .s-title{font-family:'Black Ops One',monospace;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1;background:linear-gradient(135deg,#fff 30%,var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
 .s-sub{font-size:0.78rem;line-height:1.9;color:rgba(224,255,255,0.45);max-width:480px}
-
-/* Note limitation */
 .limitation-note{margin-top:12px;font-size:0.62rem;letter-spacing:1.5px;color:rgba(255,200,0,0.45);border-left:2px solid rgba(255,200,0,0.2);padding-left:12px;line-height:1.7;max-width:480px}
 
 .tab-switcher{display:flex;gap:2px;margin-bottom:32px;border:1px solid rgba(0,255,255,0.15);background:rgba(0,255,255,0.03);padding:4px;width:fit-content}
@@ -166,7 +156,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 
 .error-box{margin-top:20px;max-width:640px;border:1px solid rgba(255,34,68,0.3);background:rgba(255,34,68,0.04);padding:20px 24px;display:none}
 .error-box.show{display:block;animation:fadeSlide 0.3s ease both}
-.error-txt{font-size:0.7rem;letter-spacing:1px;color:var(--red);line-height:1.8}
+.error-txt{font-size:0.7rem;letter-spacing:1px;color:var(--red);line-height:1.8;white-space:pre-line}
 
 .metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:32px;max-width:640px}
 .metric-item{background:var(--bg);padding:20px 24px;transition:background 0.2s}
@@ -176,7 +166,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 48px;display:fle
 .metric-bar{height:2px;background:rgba(0,255,255,0.1);margin-top:8px;position:relative;overflow:hidden}
 .metric-bar-fill{position:absolute;inset-y:0;left:0;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 8px var(--neon);animation:barFill 2s ease both}
 
-/* FEATURES */
 .features-section{position:relative;z-index:10;padding:100px 48px;border-top:1px solid rgba(0,255,255,0.08)}
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-top:64px}
 .feat-card{background:var(--bg);padding:44px 36px;position:relative;overflow:hidden;transition:all 0.3s;cursor:none}
@@ -197,62 +186,23 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 
 @keyframes fadeSlide{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-/* ===== ÉCRAN MOT DE PASSE ===== */
-#gate{
-  position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:0;
-}
+/* ===== GATE ===== */
+#gate{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
 #gate.unlocked{animation:gateOut 0.6s ease forwards}
-@keyframes gateOut{
-  0%{opacity:1;transform:translateY(0)}
-  100%{opacity:0;transform:translateY(-40px);pointer-events:none;display:none}
-}
+@keyframes gateOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px);pointer-events:none}}
 .gate-logo{font-family:'Black Ops One',monospace;font-size:clamp(3rem,8vw,6rem);background:linear-gradient(135deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:6px;margin-bottom:8px;animation:fadeSlide 0.6s ease both}
 .gate-sub{font-size:0.6rem;letter-spacing:6px;color:rgba(0,255,255,0.3);text-transform:uppercase;margin-bottom:60px;animation:fadeSlide 0.6s 0.1s ease both}
-.gate-box{
-  border:1px solid rgba(0,255,255,0.2);
-  padding:48px;width:100%;max-width:400px;
-  background:rgba(0,255,255,0.02);
-  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
-  animation:fadeSlide 0.6s 0.2s ease both;
-  position:relative;overflow:hidden;
-}
-.gate-box::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--neon),transparent);
-  animation:scanAnim 3s ease-in-out infinite;
-}
+.gate-box{border:1px solid rgba(0,255,255,0.2);padding:48px;width:100%;max-width:400px;background:rgba(0,255,255,0.02);clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);animation:fadeSlide 0.6s 0.2s ease both;position:relative;overflow:hidden}
+.gate-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent);animation:scanAnim 3s ease-in-out infinite}
 .gate-label{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:rgba(0,255,255,0.4);margin-bottom:12px;display:block}
-.gate-input-wrap{
-  display:flex;border:1px solid rgba(0,255,255,0.2);
-  overflow:hidden;margin-bottom:16px;transition:all 0.2s;
-}
+.gate-input-wrap{display:flex;border:1px solid rgba(0,255,255,0.2);overflow:hidden;margin-bottom:16px;transition:all 0.2s}
 .gate-input-wrap:focus-within{border-color:rgba(0,255,255,0.6);box-shadow:0 0 20px rgba(0,255,255,0.1)}
 .gate-prefix{font-size:0.7rem;color:var(--neon);padding:0 14px;border-right:1px solid rgba(0,255,255,0.1);height:52px;display:flex;align-items:center;text-shadow:0 0 8px var(--neon)}
-.gate-input{
-  flex:1;background:transparent;border:none;outline:none;
-  font-family:'Share Tech Mono',monospace;font-size:0.9rem;
-  color:#e0ffff;padding:0 16px;height:52px;caret-color:var(--neon);
-  letter-spacing:3px;
-}
+.gate-input{flex:1;background:transparent;border:none;outline:none;font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:#e0ffff;padding:0 16px;height:52px;caret-color:var(--neon);letter-spacing:3px}
 .gate-input::placeholder{color:rgba(224,255,255,0.15);letter-spacing:2px}
-.gate-btn{
-  width:100%;padding:16px;
-  background:rgba(0,255,255,0.08);
-  border:1px solid rgba(0,255,255,0.25);
-  color:var(--neon);font-family:'Orbitron',monospace;
-  font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;
-  cursor:pointer;transition:all 0.25s;
-  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
-}
+.gate-btn{width:100%;padding:16px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);color:var(--neon);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all 0.25s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
 .gate-btn:hover{background:rgba(0,255,255,0.15);box-shadow:0 0 25px rgba(0,255,255,0.2)}
-.gate-err{
-  margin-top:14px;font-size:0.62rem;letter-spacing:2px;
-  color:var(--red);text-align:center;height:16px;
-  animation:errShake 0.3s ease;
-}
+.gate-err{margin-top:14px;font-size:0.62rem;letter-spacing:2px;color:var(--red);text-align:center;height:16px;animation:errShake 0.3s ease}
 @keyframes errShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .gate-dots{display:flex;justify-content:center;gap:8px;margin-top:28px}
 .gate-dot{width:5px;height:5px;border-radius:50%;background:rgba(0,255,255,0.15);transition:background 0.2s}
@@ -274,7 +224,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 <div class="scanlines"></div><div class="vignette"></div>
 <canvas id="bg-canvas"></canvas>
 
-<!-- ÉCRAN MOT DE PASSE -->
+<!-- GATE -->
 <div id="gate">
   <div class="gate-logo">DEEPSHIELD</div>
   <div class="gate-sub">Système sécurisé — Accès restreint</div>
@@ -309,7 +259,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   <div class="nav-right">
     <div class="nav-status">
       <div class="status-dot"></div>
-      <span id="nav-st">IA OPÉRATIONNELLE</span>
+      <span>IA OPÉRATIONNELLE</span>
     </div>
   </div>
 </nav>
@@ -386,17 +336,15 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   </div>
 
   <div class="tab-switcher">
-    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')" aria-label="Analyser par fichier">📁 Image / Fichier</button>
-    <button class="tab-btn" id="tab-url" onclick="switchTab('url')" aria-label="Analyser par URL">🔗 URL directe</button>
+    <button class="tab-btn active" id="tab-file" onclick="switchTab('file')">📁 Image / Fichier</button>
+    <button class="tab-btn" id="tab-url" onclick="switchTab('url')">🔗 URL directe</button>
   </div>
 
   <!-- FILE -->
   <div class="dropzone active-panel" id="panel-file"
        onclick="document.getElementById('file-input').click()"
        ondragover="event.preventDefault()"
-       ondrop="handleDrop(event)"
-       role="button"
-       aria-label="Zone de dépôt d'image">
+       ondrop="handleDrop(event)">
     <div class="dz-corner dz-tl"></div><div class="dz-corner dz-tr"></div><div class="dz-corner dz-bl"></div><div class="dz-corner dz-br"></div>
     <span class="dz-icon">🔬</span>
     <div class="dz-main">GLISSER L'IMAGE ICI</div>
@@ -406,7 +354,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)"/>
 
   <div class="img-preview-wrap" id="prev-wrap">
-    <img class="img-preview" id="prev-img" src="" alt="Aperçu de l'image à analyser"/>
+    <img class="img-preview" id="prev-img" src="" alt="Aperçu"/>
     <div class="img-lbl" id="prev-lbl"></div>
   </div>
   <div class="analyze-wrap" id="analyze-wrap">
@@ -417,14 +365,14 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   <div class="url-panel" id="panel-url">
     <div class="url-wrap">
       <div class="url-pre">URL://</div>
-      <input class="url-in" id="url-in" type="text" placeholder="https://exemple.com/photo.jpg" autocomplete="off" spellcheck="false" aria-label="URL de l'image à analyser"/>
-      <button class="url-go" id="url-go" onclick="doUrl()" aria-label="Lancer l'analyse">⚡ Analyser</button>
+      <input class="url-in" id="url-in" type="text" placeholder="https://exemple.com/photo.jpg" autocomplete="off" spellcheck="false"/>
+      <button class="url-go" id="url-go" onclick="doUrl()">⚡ Analyser</button>
     </div>
     <div class="url-hint"><span>🖼 Lien direct image (.jpg .png .webp)</span><span>📸 Imgur, Reddit, etc.</span></div>
   </div>
 
   <!-- SCAN -->
-  <div class="scan-box" id="scan-box" role="status" aria-live="polite">
+  <div class="scan-box" id="scan-box">
     <div class="scan-line"></div>
     <div class="scan-txt">ANALYSE IA EN COURS...</div>
     <div class="scan-steps">
@@ -437,7 +385,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   </div>
 
   <!-- RESULT -->
-  <div class="result-box" id="result-box" role="region" aria-label="Résultat de l'analyse">
+  <div class="result-box" id="result-box">
     <div class="res-top">
       <div><div class="res-verdict" id="res-verdict"></div><div class="res-src" id="res-src"></div></div>
       <div class="res-score" id="res-score"></div>
@@ -448,7 +396,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   </div>
 
   <!-- ERROR -->
-  <div class="error-box" id="error-box" role="alert">
+  <div class="error-box" id="error-box">
     <div class="error-txt" id="error-txt"></div>
   </div>
 
@@ -473,7 +421,7 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
     <div class="feat-card"><div class="feat-num">03</div><div class="feat-icon-wrap">🎭</div><div class="feat-name">Analyse Faciale</div><p class="feat-desc">Détection des incohérences faciales : asymétrie anormale, dents générées, flou sélectif, transitions de peau artificielles.</p></div>
     <div class="feat-card"><div class="feat-num">04</div><div class="feat-icon-wrap">🔗</div><div class="feat-name">Analyse par URL</div><p class="feat-desc">Collez directement un lien image direct. Claude Vision récupère et analyse le contenu sans téléchargement manuel.</p></div>
     <div class="feat-card"><div class="feat-num">05</div><div class="feat-icon-wrap">⚡</div><div class="feat-name">Résultat en 5s</div><p class="feat-desc">Analyse complète en moins de 5 secondes. Rapport avec verdict FAKE / REAL / UNCERTAIN et détail des 4 critères.</p></div>
-    <div class="feat-card"><div class="feat-num">06</div><div class="feat-icon-wrap">🔒</div><div class="feat-name">100% Privé</div><p class="feat-desc">Aucune image stockée. La clé API est en session uniquement — effacée dès que tu fermes l'onglet. Zéro serveur intermédiaire.</p></div>
+    <div class="feat-card"><div class="feat-num">06</div><div class="feat-icon-wrap">🔒</div><div class="feat-name">100% Privé</div><p class="feat-desc">Aucune image stockée. La clé API est gérée côté serveur Vercel — jamais exposée dans le navigateur. Zéro stockage.</p></div>
   </div>
 </section>
 
@@ -487,14 +435,21 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
 </footer>
 
 <script>
-// ===== MOT DE PASSE — change la valeur ci-dessous =====
-const PASSWORD = 'deepshield2026'; // ← CHANGE ÇA
+// ============================================================
+// CONFIG — modifie uniquement ces deux lignes si nécessaire
+// ============================================================
+const PASSWORD   = 'yahya123';
+// Ton proxy Vercel — reçoit { system, messages } et appelle Claude
+const PROXY_URL  = 'https://deepshield-rho.vercel.app/api/analyze';
 
+// ============================================================
+// GATE — MOT DE PASSE
+// ============================================================
 function checkPassword(){
-  const val = document.getElementById('gate-input').value;
+  const val   = document.getElementById('gate-input').value;
   const errEl = document.getElementById('gate-err');
-  const dots = document.querySelectorAll('.gate-dot');
-  dots.forEach((d,i) => d.classList.toggle('filled', i < val.length));
+  syncDots(val.length);
+
   if(val === PASSWORD){
     sessionStorage.setItem('ds_auth','1');
     const gate = document.getElementById('gate');
@@ -506,35 +461,48 @@ function checkPassword(){
     errEl.style.animation = 'none';
     requestAnimationFrame(()=>{ errEl.style.animation = 'errShake 0.3s ease'; });
     document.getElementById('gate-input').value = '';
-    document.querySelectorAll('.gate-dot').forEach(d=>d.classList.remove('filled'));
+    syncDots(0);
   }
+}
+
+function syncDots(len){
+  document.querySelectorAll('.gate-dot').forEach((d,i)=>d.classList.toggle('filled', i < len));
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
   const input = document.getElementById('gate-input');
   if(input){
-    input.addEventListener('input', ()=>{
-      const dots = document.querySelectorAll('.gate-dot');
-      dots.forEach((d,i)=>d.classList.toggle('filled', i < input.value.length));
-    });
+    input.addEventListener('input', ()=> syncDots(input.value.length));
     input.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPassword(); });
     input.focus();
   }
   if(sessionStorage.getItem('ds_auth')==='1'){
     document.getElementById('gate').style.display='none';
   }
+  // Scroll observer
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.1});
+  document.querySelectorAll('.feat-card,.stat,.metric-item').forEach(el=>obs.observe(el));
 });
 
-// ===== JS READY — active le curseur custom =====
-document.body.classList.add('js-ready');
-
+// ============================================================
 // CURSOR
+// ============================================================
+document.body.classList.add('js-ready');
 const cur=document.getElementById('cur'),cur2=document.getElementById('cur2'),cur3=document.getElementById('cur3');
 let mx=0,my=0,r2x=0,r2y=0,r3x=0,r3y=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
-function animCursor(){r2x+=(mx-r2x)*0.15;r2y+=(my-r2y)*0.15;r3x+=(mx-r3x)*0.08;r3y+=(my-r3y)*0.08;cur2.style.left=r2x+'px';cur2.style.top=r2y+'px';cur3.style.left=r3x+'px';cur3.style.top=r3y+'px';requestAnimationFrame(animCursor)}animCursor();
+(function animCursor(){r2x+=(mx-r2x)*.15;r2y+=(my-r2y)*.15;r3x+=(mx-r3x)*.08;r3y+=(my-r3y)*.08;cur2.style.left=r2x+'px';cur2.style.top=r2y+'px';cur3.style.left=r3x+'px';cur3.style.top=r3y+'px';requestAnimationFrame(animCursor)})();
 
+// ============================================================
 // PARTICLES
+// ============================================================
 const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
 let W=0,H=0;
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
@@ -544,41 +512,33 @@ class P{constructor(){this.r()}r(){this.x=Math.random()*W;this.y=Math.random()*H
 for(let i=0;i<80;i++)PARTS.push(new P());
 function drawGrid(){ctx.strokeStyle='rgba(0,255,255,0.025)';ctx.lineWidth=.5;const g=80;for(let x=0;x<W;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
 function connectP(){for(let i=0;i<PARTS.length;i++)for(let j=i+1;j<PARTS.length;j++){const dx=PARTS[i].x-PARTS[j].x,dy=PARTS[i].y-PARTS[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.save();ctx.globalAlpha=(1-d/120)*.12;ctx.strokeStyle='rgba(0,255,255,1)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(PARTS[i].x,PARTS[i].y);ctx.lineTo(PARTS[j].x,PARTS[j].y);ctx.stroke();ctx.restore()}}}
-function anim(){ctx.clearRect(0,0,W,H);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)}anim();
+(function anim(){ctx.clearRect(0,0,W,H);drawGrid();PARTS.forEach(p=>{p.u();p.draw()});connectP();requestAnimationFrame(anim)})();
 
-// ===== URL DU PROXY VERCEL — remplace par ton URL après déploiement =====
-// Format : https://TON-PROJET.vercel.app/api/analyze
-const PROXY_URL = 'https://deepshield-rho.vercel.app/';
-
-// TAB
+// ============================================================
+// TABS
+// ============================================================
 function switchTab(t){
   ['file','url'].forEach(x=>{
     document.getElementById('panel-'+x).classList.remove('active-panel');
-    document.getElementById('tab-'+x).classList.remove('active')
+    document.getElementById('tab-'+x).classList.remove('active');
   });
   document.getElementById('panel-'+t).classList.add('active-panel');
   document.getElementById('tab-'+t).classList.add('active');
   clearUI();
 }
 
-// FILE
-let b64=null,mime=null;
-function handleFile(e){const f=e.target.files[0];if(f)loadImg(f)}
-function handleDrop(e){
-  e.preventDefault();
-  const f=e.dataTransfer.files[0];
-  if(f&&f.type.startsWith('image/'))loadImg(f);
-}
+// ============================================================
+// FILE HANDLING
+// ============================================================
+let b64=null, mime=null;
+const MAX_SIZE = 5*1024*1024;
 
-// FIX #6 : limite de taille
-const MAX_SIZE=5*1024*1024; // 5 Mo
+function handleFile(e){ const f=e.target.files[0]; if(f) loadImg(f); }
+function handleDrop(e){ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadImg(f); }
 
 function loadImg(f){
-  if(f.size>MAX_SIZE){
-    showErr('❌ Image trop lourde — max 5 Mo. La tienne fait '+(f.size/1024/1024).toFixed(1)+' Mo.');
-    return;
-  }
-  clearUI();mime=f.type;
+  if(f.size > MAX_SIZE){ showErr('❌ Image trop lourde — max 5 Mo. La tienne fait '+(f.size/1024/1024).toFixed(1)+' Mo.'); return; }
+  clearUI(); mime=f.type;
   const r=new FileReader();
   r.onload=ev=>{
     b64=ev.target.result.split(',')[1];
@@ -591,38 +551,38 @@ function loadImg(f){
   r.readAsDataURL(f);
 }
 
-// SCAN ANIM
+// ============================================================
+// SCAN ANIMATION
+// ============================================================
 const SIDS=['s1','s2','s3','s4','s5'];
 let scanTimer=null;
+
 function startScan(){
-  clearUI();
   document.getElementById('scan-box').classList.add('show');
-  SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});
+  SIDS.forEach(id=>{ const e=document.getElementById(id); e.classList.remove('done','run'); });
   let i=0;
   function next(){
-    if(i>0)document.getElementById(SIDS[i-1]).classList.replace('run','done');
-    if(i<SIDS.length){
-      document.getElementById(SIDS[i]).classList.add('run');
-      i++;
-      scanTimer=setTimeout(next,500+Math.random()*300);
-    }
+    if(i>0) document.getElementById(SIDS[i-1]).classList.replace('run','done');
+    if(i<SIDS.length){ document.getElementById(SIDS[i]).classList.add('run'); i++; scanTimer=setTimeout(next,500+Math.random()*300); }
   }
   next();
 }
+
 function stopScan(){
-  if(scanTimer)clearTimeout(scanTimer);
+  if(scanTimer) clearTimeout(scanTimer);
   document.getElementById('scan-box').classList.remove('show');
-  SIDS.forEach(id=>{const e=document.getElementById(id);e.classList.remove('done','run')});
+  SIDS.forEach(id=>{ const e=document.getElementById(id); e.classList.remove('done','run'); });
 }
+
 function clearUI(){
   stopScan();
   document.getElementById('result-box').className='result-box';
   document.getElementById('error-box').classList.remove('show');
 }
 
-// Debounce pour éviter le spam
-let analyzing=false;
-
+// ============================================================
+// CLAUDE API via PROXY VERCEL
+// ============================================================
 const SYSTEM_PROMPT = `Tu es DeepShield, expert en détection de deepfakes et images manipulées.
 Analyse l'image et réponds UNIQUEMENT en JSON valide (aucun texte avant/après, aucun bloc markdown) :
 {
@@ -640,286 +600,153 @@ score élevé = forte probabilité de manipulation. Sois précis et professionne
 
 async function callClaude(messages){
   const res = await fetch(PROXY_URL, {
-    method: 'POST',
+    method : 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ system: SYSTEM_PROMPT, messages })
+    body   : JSON.stringify({ system: SYSTEM_PROMPT, messages })
   });
 
   if(!res.ok){
-    const err = await res.json().catch(()=>({}));
+    const err  = await res.json().catch(()=>({}));
     const code = res.status;
     if(code===429) throw new Error('Trop de requêtes — attends quelques secondes (429)');
     if(code===529) throw new Error('Claude est surchargé, réessaie dans un instant (529)');
+    if(code===404) throw new Error('Endpoint introuvable (404) — vérifie que /api/analyze existe sur ton serveur Vercel.');
     throw new Error(err.error || `Erreur serveur ${code}`);
   }
   return res.json();
 }
 
-// ANALYZE FILE
+// ============================================================
+// ANALYZE — FILE
+// ============================================================
+let analyzing = false;
+
 async function doFile(){
-  if(analyzing)return;
-  if(!b64){showErr('❌ Sélectionne d\'abord une image.');return}
-  analyzing=true;
+  if(analyzing) return;
+  if(!b64){ showErr('❌ Sélectionne d\'abord une image.'); return; }
+  analyzing = true;
   startScan();
-  document.getElementById('analyze-btn').disabled=true;
+  document.getElementById('analyze-btn').disabled = true;
   try{
-    const data=await callClaude([{role:'user',content:[
-      {type:'image',source:{type:'base64',media_type:mime||'image/jpeg',data:b64}},
-      {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
+    const data = await callClaude([{role:'user',content:[
+      {type:'image', source:{type:'base64', media_type: mime||'image/jpeg', data: b64}},
+      {type:'text',  text: 'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
     ]}]);
-    if(data)showResult(data,'Image uploadée');
+    if(data) showResult(data, 'Image uploadée');
   }catch(e){
     showErr('❌ Erreur : '+e.message);
   }finally{
     stopScan();
-    document.getElementById('analyze-btn').disabled=false;
-    analyzing=false;
+    document.getElementById('analyze-btn').disabled = false;
+    analyzing = false;
   }
 }
 
-// ANALYZE URL
+// ============================================================
+// ANALYZE — URL
+// ============================================================
 async function doUrl(){
-  if(analyzing)return;
-  const rawUrl=document.getElementById('url-in').value.trim();
-  if(!rawUrl){showErr('❌ Entre une URL d\'image directe.');return}
+  if(analyzing) return;
+  const rawUrl = document.getElementById('url-in').value.trim();
+  if(!rawUrl){ showErr('❌ Entre une URL d\'image directe.'); return; }
 
-  // FIX #4 : validation URL stricte
   let parsedUrl;
   try{
-    parsedUrl=new URL(rawUrl);
-    if(!['http:','https:'].includes(parsedUrl.protocol))throw new Error('Protocole non autorisé');
-    // Bloquer les IPs privées et localhost
-    const host=parsedUrl.hostname;
-    if(/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)){
-      throw new Error('URL locale non autorisée');
-    }
+    parsedUrl = new URL(rawUrl);
+    if(!['http:','https:'].includes(parsedUrl.protocol)) throw new Error('Protocole non autorisé');
+    const host = parsedUrl.hostname;
+    if(/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)) throw new Error('URL locale non autorisée');
   }catch(e){
     showErr('❌ URL invalide — utilise une URL https:// pointant vers une image publique.\n'+e.message);
     return;
   }
 
-  analyzing=true;
+  analyzing = true;
   startScan();
-  document.getElementById('url-go').disabled=true;
+  document.getElementById('url-go').disabled = true;
   try{
-    const data=await callClaude([{role:'user',content:[
-      {type:'image',source:{type:'url',url:parsedUrl.href}},
-      {type:'text',text:'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
+    const data = await callClaude([{role:'user',content:[
+      {type:'image', source:{type:'url', url: parsedUrl.href}},
+      {type:'text',  text: 'Analyse cette image pour détecter si c\'est un deepfake ou une image générée/manipulée par IA.'}
     ]}]);
-    if(data)showResult(data,parsedUrl.href);
+    if(data) showResult(data, parsedUrl.href);
   }catch(e){
     showErr('❌ Erreur : '+e.message+'\n\n⚠ L\'URL doit pointer directement vers une image (.jpg .png .webp) accessible publiquement.');
   }finally{
     stopScan();
-    document.getElementById('url-go').disabled=false;
-    analyzing=false;
+    document.getElementById('url-go').disabled = false;
+    analyzing = false;
   }
 }
 
-// SHOW RESULT — FIX #2 : parsing JSON robuste
-function showResult(apiData,src){
+// ============================================================
+// SHOW RESULT
+// ============================================================
+function showResult(apiData, src){
   let p;
   try{
-    const t=apiData.content.map(c=>c.text||'').join('');
-    // Extraction robuste : cherche le premier objet JSON complet
-    const match=t.match(/\{[\s\S]*\}/);
-    if(!match)throw new Error('Pas de JSON trouvé dans la réponse');
-    p=JSON.parse(match[0]);
+    const t     = apiData.content.map(c=>c.text||'').join('');
+    const match = t.match(/\{[\s\S]*\}/);
+    if(!match) throw new Error('Pas de JSON trouvé dans la réponse');
+    p = JSON.parse(match[0]);
   }catch(e){
     showErr('❌ Impossible de parser la réponse IA. Réessaie. ('+e.message+')');
     return;
   }
 
-  const verdict=(p.verdict||'UNCERTAIN').toUpperCase();
-  const score=Math.min(100,Math.max(0,parseInt(p.score)||0));
-  const cr=p.criteria||{};
-  const cls=verdict==='FAKE'?'fake':verdict==='REAL'?'real':'uncertain';
-  const col=verdict==='FAKE'?'#ff2244':verdict==='REAL'?'#39ff14':'#ffff00';
+  const verdict = (p.verdict||'UNCERTAIN').toUpperCase();
+  const score   = Math.min(100, Math.max(0, parseInt(p.score)||0));
+  const cr      = p.criteria||{};
+  const cls     = verdict==='FAKE'?'fake':verdict==='REAL'?'real':'uncertain';
+  const col     = verdict==='FAKE'?'#ff2244':verdict==='REAL'?'#39ff14':'#ffff00';
 
-  const box=document.getElementById('result-box');
-  box.className='result-box show '+cls;
+  const box = document.getElementById('result-box');
+  box.className = 'result-box show '+cls;
 
-  const vEl=document.getElementById('res-verdict');
-  vEl.textContent=verdict==='FAKE'?'⚠ DEEPFAKE / MANIPULATION DÉTECTÉE':verdict==='REAL'?'✓ CONTENU AUTHENTIQUE':'⚡ RÉSULTAT INCERTAIN';
-  vEl.className='res-verdict '+cls;
+  const vEl = document.getElementById('res-verdict');
+  vEl.textContent = verdict==='FAKE'?'⚠ DEEPFAKE / MANIPULATION DÉTECTÉE':verdict==='REAL'?'✓ CONTENU AUTHENTIQUE':'⚡ RÉSULTAT INCERTAIN';
+  vEl.className   = 'res-verdict '+cls;
 
-  const sEl=document.getElementById('res-score');
-  sEl.textContent=score+'%';
-  sEl.className='res-score '+cls;
+  const sEl = document.getElementById('res-score');
+  sEl.textContent = score+'%';
+  sEl.className   = 'res-score '+cls;
 
-  document.getElementById('res-src').textContent='▸ '+(src.length>60?src.slice(0,57)+'...':src);
-  document.getElementById('res-text').textContent=p.summary||'';
+  document.getElementById('res-src').textContent  = '▸ '+(src.length>60?src.slice(0,57)+'...':src);
+  document.getElementById('res-text').textContent = p.summary||'';
 
-  const clamp=v=>Math.min(100,Math.max(0,parseInt(v)||0));
-  const barData=[
-    {l:'Cohérence visuelle',v:clamp(cr.visual_coherence)},
-    {l:'Artefacts faciaux',v:clamp(cr.facial_artifacts)},
-    {l:'Patterns IA',v:clamp(cr.generation_patterns)},
-    {l:'Confiance analyse',v:clamp(cr.global_confidence)},
+  const clamp = v=>Math.min(100, Math.max(0, parseInt(v)||0));
+  const barData = [
+    {l:'Cohérence visuelle',  v:clamp(cr.visual_coherence)},
+    {l:'Artefacts faciaux',   v:clamp(cr.facial_artifacts)},
+    {l:'Patterns IA',         v:clamp(cr.generation_patterns)},
+    {l:'Confiance analyse',   v:clamp(cr.global_confidence)},
   ];
-  document.getElementById('res-bars').innerHTML=barData.map(b=>`
+  document.getElementById('res-bars').innerHTML = barData.map(b=>`
     <div class="rbar-row">
       <div class="rbar-lbl">${b.l}</div>
       <div class="rbar-track"><div class="rbar-fill" style="width:${b.v}%;background:${col};box-shadow:0 0 8px ${col}"></div></div>
       <div class="rbar-val" style="color:${col}">${b.v}%</div>
     </div>`).join('');
 
-  const mv=[clamp(cr.visual_coherence),clamp(cr.facial_artifacts),clamp(cr.generation_patterns),clamp(cr.global_confidence)];
+  const mv = [clamp(cr.visual_coherence),clamp(cr.facial_artifacts),clamp(cr.generation_patterns),clamp(cr.global_confidence)];
   ['m1','m2','m3','m4'].forEach((id,i)=>{
-    const v=mv[i];
-    document.getElementById(id).textContent=v+'%';
-    document.getElementById(id+'b').style.width=v+'%';
+    document.getElementById(id).textContent     = mv[i]+'%';
+    document.getElementById(id+'b').style.width = mv[i]+'%';
   });
 
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
+// ============================================================
+// SHOW ERROR
+// ============================================================
 function showErr(msg){
   stopScan();
-  document.getElementById('error-txt').textContent=msg;
+  document.getElementById('error-txt').textContent = msg;
   document.getElementById('error-box').classList.add('show');
 }
 
-document.getElementById('url-in').addEventListener('keydown',e=>{if(e.key==='Enter')doUrl()});
-
-// Scroll observer
-const obs=new IntersectionObserver(en=>{en.forEach((e,i)=>{if(e.isIntersecting){e.target.style.animation=`fadeSlide 0.6s ${i*.07}s ease both`;obs.unobserve(e.target)}})},{threshold:.1});
-document.querySelectorAll('.feat-card,.stat,.metric-item').forEach(el=>obs.observe(el));
-</script><script>
-// ===== PASSWORD =====
-const PASSWORD = "yahya123"; // change ça
-
-function checkPassword(){
-  const input = document.getElementById("gate-input").value;
-  const err = document.getElementById("gate-err");
-
-  if(input === PASSWORD){
-    document.getElementById("gate").classList.add("unlocked");
-    document.body.classList.add("js-ready");
-  } else {
-    err.textContent = "❌ Mot de passe incorrect";
-  }
-}
-
-// ===== FILE =====
-let currentFile = null;
-
-function handleFile(e){
-  const file = e.target.files[0];
-  if(!file) return;
-
-  currentFile = file;
-
-  const img = document.getElementById("prev-img");
-  img.src = URL.createObjectURL(file);
-
-  document.getElementById("prev-wrap").classList.add("show");
-  document.getElementById("analyze-wrap").classList.add("show");
-  document.getElementById("prev-lbl").textContent = file.name;
-}
-
-// Drag & drop
-function handleDrop(e){
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if(!file) return;
-
-  currentFile = file;
-
-  const img = document.getElementById("prev-img");
-  img.src = URL.createObjectURL(file);
-
-  document.getElementById("prev-wrap").classList.add("show");
-  document.getElementById("analyze-wrap").classList.add("show");
-  document.getElementById("prev-lbl").textContent = file.name;
-}
-
-// ===== ANALYSE FAKE (simulation) =====
-function simulateResult(source){
-  document.getElementById("scan-box").classList.add("show");
-
-  setTimeout(()=>{
-    document.getElementById("scan-box").classList.remove("show");
-
-    const resultBox = document.getElementById("result-box");
-    resultBox.classList.add("show");
-
-    const fakeScore = Math.floor(Math.random()*100);
-
-    let verdict = "INCERTAIN";
-    let cls = "uncertain";
-
-    if(fakeScore > 70){
-      verdict = "⚠ DEEPFAKE PROBABLE";
-      cls = "fake";
-    } else if(fakeScore < 30){
-      verdict = "✅ IMAGE AUTHENTIQUE";
-      cls = "real";
-    }
-
-    document.getElementById("res-verdict").textContent = verdict;
-    document.getElementById("res-verdict").className = "res-verdict " + cls;
-
-    document.getElementById("res-score").textContent = fakeScore + "%";
-    document.getElementById("res-score").className = "res-score " + cls;
-
-    document.getElementById("res-src").textContent = source;
-
-    document.getElementById("res-text").textContent =
-      "Analyse simulée. Pour une vraie détection, connecte une API IA (Claude, OpenAI Vision, etc).";
-
-    // Metrics
-    updateMetric("m1", fakeScore);
-    updateMetric("m2", Math.random()*100);
-    updateMetric("m3", Math.random()*100);
-    updateMetric("m4", fakeScore);
-
-  }, 2000);
-}
-
-function updateMetric(id, val){
-  val = Math.floor(val);
-  document.getElementById(id).textContent = val + "%";
-  document.getElementById(id+"b").style.width = val + "%";
-}
-
-// ===== ACTIONS =====
-function doFile(){
-  if(!currentFile) return;
-  simulateResult(currentFile.name);
-}
-
-function doUrl(){
-  const url = document.getElementById("url-in").value;
-  if(!url){
-    alert("Entre une URL");
-    return;
-  }
-
-  if(!url.match(/\.(jpg|jpeg|png|webp)$/)){
-    alert("URL invalide (doit être une image)");
-    return;
-  }
-
-  simulateResult(url);
-}
-
-// ===== TAB SWITCH =====
-function switchTab(tab){
-  document.getElementById("panel-file").classList.remove("active-panel");
-  document.getElementById("panel-url").classList.remove("active-panel");
-
-  document.getElementById("tab-file").classList.remove("active");
-  document.getElementById("tab-url").classList.remove("active");
-
-  if(tab === "file"){
-    document.getElementById("panel-file").classList.add("active-panel");
-    document.getElementById("tab-file").classList.add("active");
-  } else {
-    document.getElementById("panel-url").classList.add("active-panel");
-    document.getElementById("tab-url").classList.add("active");
-  }
-}
+document.getElementById('url-in').addEventListener('keydown', e=>{ if(e.key==='Enter') doUrl(); });
 </script>
 </body>
 </html>
