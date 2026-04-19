@@ -217,44 +217,58 @@ footer{position:relative;z-index:10;border-top:1px solid rgba(0,255,255,0.1);pad
   footer{flex-direction:column;gap:16px;text-align:center;padding:32px 20px}
 }
 
+
 /* ===== SPEEDTEST MODAL ===== */
-#st-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,2,5,0.95);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center}
+#st-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,2,5,0.96);backdrop-filter:blur(24px);display:none;align-items:center;justify-content:center;overflow-y:auto;padding:20px 0}
 #st-overlay.open{display:flex;animation:fadeSlide 0.3s ease both}
-.st-modal{position:relative;width:100%;max-width:560px;border:1px solid rgba(0,255,255,0.2);background:rgba(0,2,5,0.98);padding:48px 40px;clip-path:polygon(16px 0%,100% 0%,calc(100% - 16px) 100%,0% 100%)}
-.st-close{position:absolute;top:20px;right:20px;background:none;border:1px solid rgba(0,255,255,0.2);color:var(--neon);font-size:1rem;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.st-modal{position:relative;width:100%;max-width:620px;border:1px solid rgba(0,255,255,0.2);background:rgba(0,2,5,0.99);padding:44px 40px 36px;clip-path:polygon(16px 0%,100% 0%,calc(100% - 16px) 100%,0% 100%)}
+.st-close{position:absolute;top:18px;right:18px;background:none;border:1px solid rgba(0,255,255,0.2);color:var(--neon);font-size:1rem;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
 .st-close:hover{background:rgba(255,34,68,0.1);border-color:var(--red);color:var(--red)}
 .st-title{font-family:Orbitron,monospace;font-weight:900;font-size:1.2rem;letter-spacing:4px;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.st-sub{font-size:0.6rem;letter-spacing:3px;color:rgba(0,255,255,0.3);margin-bottom:36px;text-transform:uppercase}
+.st-sub{font-size:0.58rem;letter-spacing:3px;color:rgba(0,255,255,0.3);margin-bottom:28px;text-transform:uppercase}
 
-/* GAUGE */
-.st-gauge-wrap{display:flex;justify-content:center;margin-bottom:32px;position:relative}
-.st-gauge{position:relative;width:220px;height:110px}
-.st-gauge svg{width:100%;height:100%}
-.st-gauge-val{position:absolute;bottom:0;left:50%;transform:translateX(-50%);text-align:center}
-.st-gauge-num{font-family:Black Ops One,monospace;font-size:2.8rem;letter-spacing:2px;color:#fff;line-height:1;transition:color 0.4s}
-.st-gauge-unit{font-size:0.6rem;letter-spacing:3px;color:rgba(0,255,255,0.4);display:block;margin-top:4px}
-
-/* METRICS ROW */
-.st-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-bottom:28px}
-.st-metric{background:var(--bg);padding:18px;text-align:center}
-.st-metric-lbl{font-size:0.55rem;letter-spacing:2px;text-transform:uppercase;color:rgba(224,255,255,0.3);margin-bottom:8px}
-.st-metric-val{font-family:Orbitron,monospace;font-size:1.3rem;font-weight:700;color:var(--neon);text-shadow:0 0 12px var(--neon)}
-.st-metric-unit{font-size:0.5rem;letter-spacing:1px;color:rgba(0,255,255,0.3)}
-
-/* STATUS BAR */
-.st-status{font-size:0.62rem;letter-spacing:2px;color:rgba(0,255,255,0.4);text-align:center;margin-bottom:24px;height:20px}
-
-/* START BTN */
-.st-start{width:100%;padding:16px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);color:var(--neon);font-family:Orbitron,monospace;font-size:0.72rem;letter-spacing:4px;text-transform:uppercase;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.25s}
-.st-start:hover:not(:disabled){background:rgba(0,255,255,0.15);box-shadow:0 0 30px rgba(0,255,255,0.25)}
-.st-start:disabled{opacity:0.35;pointer-events:none}
+/* CONNECTION INFO */
+.st-conn-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.12);margin-bottom:24px}
+.st-conn-item{background:var(--bg);padding:14px 10px;text-align:center}
+.st-conn-lbl{font-size:0.5rem;letter-spacing:2px;text-transform:uppercase;color:rgba(224,255,255,0.25);margin-bottom:6px}
+.st-conn-val{font-family:Orbitron,monospace;font-size:0.78rem;font-weight:700;letter-spacing:1px;color:var(--neon);text-shadow:0 0 10px var(--neon);white-space:nowrap}
+.st-conn-icon{font-size:1.1rem;display:block;margin-bottom:4px}
 
 /* PHASES */
-.st-phases{display:flex;justify-content:center;gap:24px;margin-bottom:24px}
-.st-phase{font-size:0.58rem;letter-spacing:2px;color:rgba(0,255,255,0.2);display:flex;align-items:center;gap:6px;transition:color 0.3s}
+.st-phases{display:flex;justify-content:center;gap:20px;margin-bottom:22px}
+.st-phase{font-size:0.56rem;letter-spacing:2px;color:rgba(0,255,255,0.2);display:flex;align-items:center;gap:6px;transition:color 0.3s}
 .st-phase.active{color:var(--neon);text-shadow:0 0 8px var(--neon)}
 .st-phase.done{color:var(--green)}
 .st-phase-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* GAUGE */
+.st-gauge-wrap{display:flex;justify-content:center;margin-bottom:28px;position:relative}
+.st-gauge{position:relative;width:220px;height:116px}
+.st-gauge svg{width:100%;height:100%}
+.st-gauge-val{position:absolute;bottom:0;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.st-gauge-num{font-family:'Black Ops One',monospace;font-size:2.6rem;letter-spacing:2px;color:#fff;line-height:1;transition:color 0.3s}
+.st-gauge-unit{font-size:0.58rem;letter-spacing:3px;color:rgba(0,255,255,0.4);display:block;margin-top:2px}
+.st-gauge-label{font-size:0.5rem;letter-spacing:2px;color:rgba(0,255,255,0.3);display:block}
+
+/* METRICS */
+.st-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(0,255,255,0.05);border:1px solid rgba(0,255,255,0.1);margin-bottom:20px}
+.st-metric{background:var(--bg);padding:16px;text-align:center}
+.st-metric-lbl{font-size:0.52rem;letter-spacing:2px;text-transform:uppercase;color:rgba(224,255,255,0.3);margin-bottom:6px}
+.st-metric-val{font-family:Orbitron,monospace;font-size:1.25rem;font-weight:700;color:var(--neon);text-shadow:0 0 12px var(--neon);transition:color 0.4s}
+.st-metric-unit{font-size:0.48rem;letter-spacing:1px;color:rgba(0,255,255,0.3)}
+
+/* SIGNAL BAR */
+.st-signal-wrap{display:flex;align-items:flex-end;gap:3px;height:18px;margin-bottom:2px}
+.st-signal-bar{width:6px;background:rgba(0,255,255,0.12);border-radius:1px;transition:background 0.3s}
+.st-signal-bar.lit{background:var(--green);box-shadow:0 0 4px var(--green)}
+
+/* STATUS */
+.st-status{font-size:0.6rem;letter-spacing:1.5px;color:rgba(0,255,255,0.4);text-align:center;margin-bottom:20px;min-height:18px;line-height:1.6}
+
+/* BTN */
+.st-start{width:100%;padding:15px;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);color:var(--neon);font-family:Orbitron,monospace;font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:all 0.25s}
+.st-start:hover:not(:disabled){background:rgba(0,255,255,0.15);box-shadow:0 0 28px rgba(0,255,255,0.25)}
+.st-start:disabled{opacity:0.35;pointer-events:none}
 
 </style>
 </head>
@@ -789,249 +803,3 @@ function showErr(msg){
 }
 
 document.getElementById('url-in').addEventListener('keydown', e=>{ if(e.key==='Enter') doUrl(); });
-
-
-// ============================================================
-// SPEEDTEST
-// ============================================================
-function openSpeedtest(){ document.getElementById('st-overlay').classList.add('open'); }
-function closeSpeedtest(){ document.getElementById('st-overlay').classList.remove('open'); }
-
-// Close on overlay click
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('st-overlay').addEventListener('click', e=>{
-    if(e.target === document.getElementById('st-overlay')) closeSpeedtest();
-  });
-});
-
-const ARC_LEN = 283; // half-circle dasharray
-
-function setGauge(mbps, color){
-  const max   = 100;
-  const ratio = Math.min(mbps / max, 1);
-  const offset = ARC_LEN - ratio * ARC_LEN;
-  const arc = document.getElementById('st-arc');
-  arc.style.strokeDashoffset = offset;
-  arc.style.stroke = color;
-  document.getElementById('st-gauge-num').textContent = mbps >= 10 ? mbps.toFixed(1) : mbps.toFixed(2);
-  document.getElementById('st-gauge-num').style.color = color;
-}
-
-function resetGauge(){
-  document.getElementById('st-arc').style.strokeDashoffset = ARC_LEN;
-  document.getElementById('st-gauge-num').textContent = '—';
-  document.getElementById('st-gauge-num').style.color = '#fff';
-}
-
-function setPhase(id){
-  ['ph-ping','ph-dl','ph-ul'].forEach(p=>{
-    const el = document.getElementById(p);
-    el.classList.remove('active','done');
-  });
-  if(id) document.getElementById(id).classList.add('active');
-}
-
-function donePhase(id){
-  document.getElementById(id).classList.remove('active');
-  document.getElementById(id).classList.add('done');
-}
-
-function setStatus(txt){ document.getElementById('st-status').textContent = txt; }
-
-function getColor(mbps){
-  if(mbps >= 50) return 'var(--green)';
-  if(mbps >= 10) return 'var(--neon)';
-  if(mbps >= 2)  return 'var(--neon3)';
-  return 'var(--red)';
-}
-
-// Update nav button
-function updateNavBtn(dl, ul, ping){
-  document.getElementById('nav-wifi-icon').textContent = dl >= 10 ? '📶' : dl >= 2 ? '📶' : '📵';
-  document.getElementById('nav-wifi-val').textContent  = dl.toFixed(1) + ' Mbps';
-}
-
-async function measurePing(){
-  const times = [];
-  for(let i=0;i<4;i++){
-    const t0 = performance.now();
-    await fetch('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js?_='+Date.now()+i, {cache:'no-store', mode:'no-cors'}).catch(()=>{});
-    times.push(performance.now()-t0);
-  }
-  return Math.round(Math.min(...times));
-}
-
-async function measureDownload(){
-  // Download ~570KB file, animate gauge live
-  const url   = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?_='+Date.now();
-  const t0    = performance.now();
-  const res   = await fetch(url, {cache:'no-store'});
-  const reader= res.body.getReader();
-  let bytes   = 0;
-  while(true){
-    const {done, value} = await reader.read();
-    if(done) break;
-    bytes += value.length;
-    const elapsed = (performance.now()-t0)/1000;
-    if(elapsed > 0){
-      const live = (bytes*8)/elapsed/1_000_000;
-      setGauge(live, getColor(live));
-    }
-  }
-  const total = (performance.now()-t0)/1000;
-  return (bytes*8)/total/1_000_000;
-}
-
-async function measureUpload(){
-  // Simulate upload by timing a POST with dummy data
-  const sizes = [50000, 100000, 200000];
-  let total = 0, totalBytes = 0;
-  for(const size of sizes){
-    const data = new Uint8Array(size);
-    const t0   = performance.now();
-    await fetch('https://httpbin.org/post', {
-      method:'POST',
-      body: data,
-      mode:'no-cors',
-      cache:'no-store'
-    }).catch(()=>{});
-    const elapsed = (performance.now()-t0)/1000;
-    const live    = (size*8)/elapsed/1_000_000;
-    setGauge(live, '#ff00ff');
-    total      += elapsed;
-    totalBytes += size;
-  }
-  return (totalBytes*8)/total/1_000_000;
-}
-
-let stRunning = false;
-
-async function runSpeedtest(){
-  if(stRunning) return;
-  stRunning = true;
-
-  // Reset UI
-  document.getElementById('st-btn').disabled = true;
-  document.getElementById('st-dl').textContent   = '—';
-  document.getElementById('st-ul').textContent   = '—';
-  document.getElementById('st-ping').textContent = '—';
-  document.getElementById('st-gauge-unit').textContent = 'Mbps';
-  resetGauge();
-  setPhase(null);
-
-  try{
-    // === PING ===
-    setPhase('ph-ping');
-    setStatus('Mesure du ping...');
-    document.getElementById('st-gauge-unit').textContent = 'ms';
-    const ping = await measurePing();
-    document.getElementById('st-ping').textContent = ping;
-    const pingColor = ping < 30 ? 'var(--green)' : ping < 80 ? 'var(--neon)' : ping < 150 ? 'var(--neon3)' : 'var(--red)';
-    document.getElementById('st-ping').style.color = pingColor;
-    donePhase('ph-ping');
-
-    // === DOWNLOAD ===
-    setPhase('ph-dl');
-    setStatus('Test de download en cours...');
-    document.getElementById('st-gauge-unit').textContent = 'Mbps';
-    resetGauge();
-    const dl = await measureDownload();
-    document.getElementById('st-dl').textContent = dl.toFixed(1);
-    document.getElementById('st-dl').style.color = getColor(dl);
-    setGauge(dl, getColor(dl));
-    donePhase('ph-dl');
-
-    // === UPLOAD ===
-    setPhase('ph-ul');
-    setStatus('Test upload en cours...');
-    resetGauge();
-    const ul = await measureUpload();
-    document.getElementById('st-ul').textContent = ul.toFixed(1);
-    document.getElementById('st-ul').style.color = getColor(ul);
-    setGauge(ul, '#ff00ff');
-    donePhase('ph-ul');
-
-    // Done
-    setStatus('✓ Test terminé — Download: '+dl.toFixed(1)+' Mbps | Upload: '+ul.toFixed(1)+' Mbps | Ping: '+ping+' ms');
-    updateNavBtn(dl, ul, ping);
-
-  }catch(e){
-    setStatus('❌ Erreur : '+e.message);
-  }finally{
-    document.getElementById('st-btn').disabled = false;
-    stRunning = false;
-  }
-}
-
-</script>
-
-<!-- SPEEDTEST MODAL -->
-<div id="st-overlay">
-  <div class="st-modal">
-    <button class="st-close" onclick="closeSpeedtest()">✕</button>
-    <div class="st-title">SPEEDTEST</div>
-    <div class="st-sub">// Test de débit réseau en temps réel</div>
-
-    <div class="st-phases">
-      <div class="st-phase" id="ph-ping"><div class="st-phase-dot"></div>PING</div>
-      <div class="st-phase" id="ph-dl"><div class="st-phase-dot"></div>DOWNLOAD</div>
-      <div class="st-phase" id="ph-ul"><div class="st-phase-dot"></div>UPLOAD</div>
-    </div>
-
-    <div class="st-gauge-wrap">
-      <div class="st-gauge">
-        <svg viewBox="0 0 220 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Track -->
-          <path d="M 20 110 A 90 90 0 0 1 200 110" stroke="rgba(0,255,255,0.08)" stroke-width="12" stroke-linecap="round"/>
-          <!-- Fill arc -->
-          <path id="st-arc" d="M 20 110 A 90 90 0 0 1 200 110" stroke="var(--neon)" stroke-width="12" stroke-linecap="round"
-            stroke-dasharray="283" stroke-dashoffset="283" style="transition:stroke-dashoffset 0.15s ease,stroke 0.4s"/>
-          <!-- Tick marks -->
-          <g stroke="rgba(0,255,255,0.15)" stroke-width="1">
-            <line x1="20" y1="110" x2="26" y2="110" transform="rotate(-180 110 110)"/>
-            <line x1="20" y1="110" x2="24" y2="110" transform="rotate(-157.5 110 110)"/>
-            <line x1="20" y1="110" x2="26" y2="110" transform="rotate(-135 110 110)"/>
-            <line x1="20" y1="110" x2="24" y2="110" transform="rotate(-112.5 110 110)"/>
-            <line x1="20" y1="110" x2="26" y2="110" transform="rotate(-90 110 110)"/>
-            <line x1="20" y1="110" x2="24" y2="110" transform="rotate(-67.5 110 110)"/>
-            <line x1="20" y1="110" x2="26" y2="110" transform="rotate(-45 110 110)"/>
-            <line x1="20" y1="110" x2="24" y2="110" transform="rotate(-22.5 110 110)"/>
-            <line x1="20" y1="110" x2="26" y2="110" transform="rotate(0 110 110)"/>
-          </g>
-          <!-- Labels -->
-          <text x="16" y="106" fill="rgba(0,255,255,0.3)" font-size="8" font-family="Share Tech Mono">0</text>
-          <text x="104" y="24" fill="rgba(0,255,255,0.3)" font-size="8" font-family="Share Tech Mono" text-anchor="middle">50</text>
-          <text x="198" y="106" fill="rgba(0,255,255,0.3)" font-size="8" font-family="Share Tech Mono" text-anchor="end">100+</text>
-        </svg>
-        <div class="st-gauge-val">
-          <div class="st-gauge-num" id="st-gauge-num">—</div>
-          <span class="st-gauge-unit" id="st-gauge-unit">Mbps</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="st-metrics">
-      <div class="st-metric">
-        <div class="st-metric-lbl">⬇ Download</div>
-        <div class="st-metric-val" id="st-dl">—</div>
-        <div class="st-metric-unit">Mbps</div>
-      </div>
-      <div class="st-metric">
-        <div class="st-metric-lbl">⬆ Upload</div>
-        <div class="st-metric-val" id="st-ul">—</div>
-        <div class="st-metric-unit">Mbps</div>
-      </div>
-      <div class="st-metric">
-        <div class="st-metric-lbl">⏱ Ping</div>
-        <div class="st-metric-val" id="st-ping">—</div>
-        <div class="st-metric-unit">ms</div>
-      </div>
-    </div>
-
-    <div class="st-status" id="st-status">Prêt — clique pour lancer le test</div>
-    <button class="st-start" id="st-btn" onclick="runSpeedtest()">⚡ LANCER LE TEST</button>
-  </div>
-</div>
-
-</body>
-</html>
